@@ -32,7 +32,7 @@ public class AdController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ExtendedAd> getAdFromId(@PathVariable Integer id) {
+    public ResponseEntity<ExtendedAd> getAdById(@PathVariable Integer id) {
         ExtendedAd extendedAd = new ExtendedAd();
         return ResponseEntity.ok(extendedAd);
     }
