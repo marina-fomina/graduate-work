@@ -6,6 +6,7 @@ import ru.skypro.homework.dto.Comments;
 import ru.skypro.homework.dto.CreateOrUpdateComment;
 
 @RestController
+@CrossOrigin(value = "http://localhost:3000")
 @RequestMapping("/ads")
 public class CommentController {
 
@@ -21,12 +22,13 @@ public class CommentController {
     }
 
     @DeleteMapping("/{adId}/comments/{commentId}")
-    public ResponseEntity<Void> updateComment(@PathVariable Integer adId, @PathVariable Integer commentId) {
+    public ResponseEntity<Void> deleteComment(@PathVariable Integer adId, @PathVariable Integer commentId) {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/{adId}/comments/{commentId}")
-    public ResponseEntity<Void> deleteComment(@PathVariable Integer adId, @PathVariable Integer commentId, @RequestBody CreateOrUpdateComment comment) {
+    @PatchMapping("/{adId}/comments/{commentId}")
+    public ResponseEntity<Void> updateComment(@PathVariable Integer adId, @PathVariable Integer commentId,
+                                              @RequestBody CreateOrUpdateComment comment) {
         return ResponseEntity.ok().build();
     }
 }
