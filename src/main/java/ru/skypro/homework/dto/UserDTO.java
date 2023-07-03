@@ -7,7 +7,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UsersDTO {
+public class UserDTO {
 
     private Integer id;
     private String email; //логин
