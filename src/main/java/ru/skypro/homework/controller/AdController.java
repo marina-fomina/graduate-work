@@ -1,62 +1,81 @@
 package ru.skypro.homework.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ru.skypro.homework.dto.Ad;
-import ru.skypro.homework.dto.Ads;
-import ru.skypro.homework.dto.CreateOrUpdateAd;
-import ru.skypro.homework.dto.ExtendedAd;
-
-import java.util.List;
+import ru.skypro.homework.dto.AdDTO;
+import ru.skypro.homework.dto.AdsDTO;
+import ru.skypro.homework.dto.CreateOrUpdateAdDTO;
+import ru.skypro.homework.dto.ExtendedAdDTO;
+import ru.skypro.homework.service.AdService;
 
 @RestController
 @CrossOrigin(value = "http://localhost:3000")
 @RequestMapping("/ads")
 public class AdController {
+    @Autowired
+    AdService adService;
+
     @GetMapping
-    public ResponseEntity<Ads> getAds() {
-        Ads ads = new Ads();
+    public ResponseEntity<AdsDTO> getAds() {
+        AdsDTO ads = adService.getAds();
         return ResponseEntity.ok(ads);
     }
 
     @PostMapping
-    public ResponseEntity<Ad> addAd(Authentication authentication,
-                                     @RequestParam MultipartFile image,
-                                     @RequestParam Double price,
-                                     @RequestParam String title) {
-        Ad ad = new Ad();
-        return ResponseEntity.ok(ad);
+    public ResponseEntity<AdDTO> addAd(Authentication authentication,
+                                       @RequestParam MultipartFile image,
+                                       @RequestParam Integer price,
+                                       @RequestParam String title) {
+        // Сохранение image в репозиторий пользователя
+        String imageLink = adService.saveImage(image);
+
+        // Формируем DTO
+        AdDTO adDto = new AdDTO();
+        adDto.setTitle(title);
+        adDto.setPrice(price);
+        adDto.setImage(imageLink);
+
+        //Передача в service
+        adService.addAd(adDto);
+        return new ResponseEntity<>(adDto, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ExtendedAd> getAdById(@PathVariable Integer id) {
-        ExtendedAd extendedAd = new ExtendedAd();
-        return ResponseEntity.ok(extendedAd);
+    public ResponseEntity<ExtendedAdDTO> getAdById(@PathVariable Integer id) {
+        ExtendedAdDTO extendedAdDTO = adService.getAdById(id);
+        return ResponseEntity.ok(extendedAdDTO);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteAd(@PathVariable Integer id) {
-        return ResponseEntity.ok().build();
+        if (adService.deleteAd(id)) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Ad> patchAd(@PathVariable Integer id,
-                                       @RequestBody CreateOrUpdateAd createOrUpdateAd) {
+    public ResponseEntity<AdDTO> patchAd(@PathVariable Integer id,
+                                         @RequestBody CreateOrUpdateAdDTO createOrUpdateAdDTO) {
+        adService.patchAd(id, createOrUpdateAdDTO);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/me")
-    public ResponseEntity<Ads> getUserAd(Authentication authentication) {
-        Ads ads = new Ads();
+    public ResponseEntity<AdsDTO> getUserAd(Authentication authentication) {
+        AdsDTO ads = new AdsDTO();
         return ResponseEntity.ok(ads);
     }
 
     @PatchMapping("/{id}/image")
     public ResponseEntity<String> updateImage(@PathVariable Integer id,
                                                @RequestParam MultipartFile image) {
-        return ResponseEntity.ok().build();
+        String imageLink = adService.saveImage(id, image);
+        return imageLink == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(imageLink);
     }
 }

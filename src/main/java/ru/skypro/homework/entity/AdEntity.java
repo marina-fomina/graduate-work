@@ -1,0 +1,25 @@
+package ru.skypro.homework.entity;
+
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.beans.factory.annotation.Value;
+
+import javax.persistence.*;
+
+@Entity
+@Getter
+@Setter
+@Table(name = "ads")
+public class AdEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+    @Column(name = "author_id")
+    private Integer author;
+    String image;
+    Integer price;
+    @Column(length = 100)
+    String title;
+    @Column(length = 1024)
+    String description;
+}
