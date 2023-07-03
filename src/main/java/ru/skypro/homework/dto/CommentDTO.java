@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Comment {
+public class CommentDTO {
     private Integer author; // id автора комментария
     private String authorImage; // ссылка на аватар автора комментария
     private String authorFirstName; // имя создателя комментария
