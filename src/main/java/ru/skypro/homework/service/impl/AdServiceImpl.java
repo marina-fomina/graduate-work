@@ -7,10 +7,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-import ru.skypro.homework.dto.Ad;
-import ru.skypro.homework.dto.Ads;
-import ru.skypro.homework.dto.CreateOrUpdateAd;
-import ru.skypro.homework.dto.ExtendedAd;
+import ru.skypro.homework.dto.AdDTO;
+import ru.skypro.homework.dto.AdsDTO;
+import ru.skypro.homework.dto.CreateOrUpdateAdDTO;
+import ru.skypro.homework.dto.ExtendedAdDTO;
 import ru.skypro.homework.entity.AdEntity;
 import ru.skypro.homework.repository.AdRepository;
 import ru.skypro.homework.service.AdService;
@@ -42,25 +42,25 @@ public class AdServiceImpl implements AdService {
     //        return ResponseEntity.ok(ads);
     //    }
     @Override
-    public Ads getAds() {
+    public AdsDTO getAds() {
         List<AdEntity> entityList = adRepository.findAll();
         return adMapping.mapEntityListToAdsDto(entityList);
     }
 
     @Override
-    public void addAd(Ad ad) {
-        AdEntity adEntity = new AdMapping().mapDtoToAdEntity(ad);
+    public void addAd(AdDTO adDTO) {
+        AdEntity adEntity = new AdMapping().mapDtoToAdEntity(adDTO);
         adRepository.save(adEntity);
     }
 
     @Override
-    public ExtendedAd getAdById(Integer id) {
-        ExtendedAd extendedAd = new ExtendedAd();
+    public ExtendedAdDTO getAdById(Integer id) {
+        ExtendedAdDTO extendedAdDTO = new ExtendedAdDTO();
         Optional<AdEntity> adEntity = adRepository.findById(id);
         if (adEntity.isPresent()) {
-            extendedAd = adMapping.mapEntityToExtendedAdDto(adEntity.get());
+            extendedAdDTO = adMapping.mapEntityToExtendedAdDto(adEntity.get());
         }
-        return extendedAd;
+        return extendedAdDTO;
     }
 
     @Override
@@ -70,7 +70,7 @@ public class AdServiceImpl implements AdService {
         return flag;
     }
     @Override
-    public Ad patchAd(Integer id, CreateOrUpdateAd createOrUpdateAd) {
+    public AdDTO patchAd(Integer id, CreateOrUpdateAdDTO createOrUpdateAdDTO) {
         // TODO:
         //  1) разобраться с классами CreateOrUpdateAd и Ad
         //  2) как не затереть лишнее

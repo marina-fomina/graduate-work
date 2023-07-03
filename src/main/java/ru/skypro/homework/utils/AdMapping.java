@@ -1,10 +1,10 @@
 package ru.skypro.homework.utils;
 
 import org.springframework.stereotype.Service;
-import ru.skypro.homework.dto.Ad;
-import ru.skypro.homework.dto.Ads;
-import ru.skypro.homework.dto.CreateOrUpdateAd;
-import ru.skypro.homework.dto.ExtendedAd;
+import ru.skypro.homework.dto.AdDTO;
+import ru.skypro.homework.dto.AdsDTO;
+import ru.skypro.homework.dto.CreateOrUpdateAdDTO;
+import ru.skypro.homework.dto.ExtendedAdDTO;
 import ru.skypro.homework.entity.AdEntity;
 
 import java.util.Collection;
@@ -12,8 +12,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class AdMapping {
-    public Ad mapEntityToAdDto(AdEntity ad) {
-        Ad adDto = new Ad();
+    public AdDTO mapEntityToAdDto(AdEntity ad) {
+        AdDTO adDto = new AdDTO();
         adDto.setPk(ad.getId());
         adDto.setAuthor(ad.getAuthor());
         adDto.setImage(ad.getImage());
@@ -22,15 +22,15 @@ public class AdMapping {
         return adDto;
     }
 
-    public Ads mapEntityListToAdsDto(Collection<AdEntity> ad) {
-        Ads adsDto = new Ads();
+    public AdsDTO mapEntityListToAdsDto(Collection<AdEntity> ad) {
+        AdsDTO adsDto = new AdsDTO();
         adsDto.setCount(ad.size());
         adsDto.setResults(ad.stream().map(this::mapEntityToAdDto).collect(Collectors.toList()));
         return adsDto;
     }
 
-    public ExtendedAd mapEntityToExtendedAdDto(AdEntity ad) {
-        ExtendedAd extendedAdDto = new ExtendedAd();
+    public ExtendedAdDTO mapEntityToExtendedAdDto(AdEntity ad) {
+        ExtendedAdDTO extendedAdDto = new ExtendedAdDTO();
         extendedAdDto.setPk(ad.getId());
         extendedAdDto.setDescription(ad.getDescription());
         extendedAdDto.setImage(ad.getImage());
@@ -48,15 +48,15 @@ public class AdMapping {
         return extendedAdDto;
     }
 
-    public CreateOrUpdateAd mapEntityToCreateOrUpdateAd(AdEntity ad) {
-        CreateOrUpdateAd createOrUpdateAd = new CreateOrUpdateAd();
-        createOrUpdateAd.setTitle(ad.getTitle());
-        createOrUpdateAd.setPrice(ad.getPrice());
-        createOrUpdateAd.setDescription(ad.getDescription());
-        return createOrUpdateAd;
+    public CreateOrUpdateAdDTO mapEntityToCreateOrUpdateAd(AdEntity ad) {
+        CreateOrUpdateAdDTO createOrUpdateAdDTO = new CreateOrUpdateAdDTO();
+        createOrUpdateAdDTO.setTitle(ad.getTitle());
+        createOrUpdateAdDTO.setPrice(ad.getPrice());
+        createOrUpdateAdDTO.setDescription(ad.getDescription());
+        return createOrUpdateAdDTO;
     }
 
-    public AdEntity mapCreateOrUpdateAdToEntity(CreateOrUpdateAd ad) {
+    public AdEntity mapCreateOrUpdateAdToEntity(CreateOrUpdateAdDTO ad) {
         AdEntity adEntity = new AdEntity();
         adEntity.setTitle(ad.getTitle());
         adEntity.setPrice(ad.getPrice());
@@ -64,15 +64,15 @@ public class AdMapping {
         return adEntity;
     }
 
-    public AdEntity mapDtoToAdEntity(Ad ad) {
+    public AdEntity mapDtoToAdEntity(AdDTO adDTO) {
         AdEntity adEntity = new AdEntity();
         // TODO: дописать
         adEntity.setAuthor(null);
         adEntity.setDescription(null);
 
-        adEntity.setTitle(ad.getTitle());
-        adEntity.setPrice(ad.getPrice());
-        adEntity.setImage(ad.getImage());
+        adEntity.setTitle(adDTO.getTitle());
+        adEntity.setPrice(adDTO.getPrice());
+        adEntity.setImage(adDTO.getImage());
         return adEntity;
     }
 }

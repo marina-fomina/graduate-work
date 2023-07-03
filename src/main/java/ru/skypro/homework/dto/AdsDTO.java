@@ -5,12 +5,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateOrUpdateAd {
-    String description;
-    Integer price;
-    String title;
+public class AdsDTO {
+    int count;
+    List<AdDTO> results = new ArrayList<>();
 }

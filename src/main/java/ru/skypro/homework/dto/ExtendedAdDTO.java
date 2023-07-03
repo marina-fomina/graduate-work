@@ -5,10 +5,14 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class Ad {
-    Integer author;
+public class ExtendedAdDTO {
     Integer pk;
+    String authorFirstName;
+    String authorLastName;
+    String description;
+    String email;
     String image;
+    String phone;
     Integer price;
     String title;
 }
