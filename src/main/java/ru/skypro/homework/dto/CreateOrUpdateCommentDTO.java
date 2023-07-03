@@ -5,6 +5,6 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class CreateOrUpdateComment {
+public class CreateOrUpdateCommentDTO {
     private String text;
 }
