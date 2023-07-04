@@ -14,7 +14,7 @@ import javax.persistence.*;
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "author_id", nullable = false)
@@ -22,6 +22,8 @@ public class Comment {
 
     @ManyToOne
     @JoinColumn(name = "ad_id", nullable = false)
-    private Ad ad;
+    private AdEntity ad;
+
+    private String text;
 
 }

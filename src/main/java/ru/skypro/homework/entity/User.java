@@ -7,6 +7,8 @@ import lombok.Setter;
 import ru.skypro.homework.dto.Role;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -41,6 +43,19 @@ public class User {
 
     @Column
     private String image; //ссылка на аватар пользователя
+
+    @OneToMany(mappedBy="author")
+    private List<Comment> comments;
+
+    //  метод для установки связи
+    public void addComment(Comment comment) {
+        if (comments == null) {
+            comments = new ArrayList<>();
+        }
+
+        comments.add(comment);
+        comment.setAuthor(this);
+    }
 
     @Override
     public boolean equals(Object o) {

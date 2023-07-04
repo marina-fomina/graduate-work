@@ -4,16 +4,22 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.skypro.homework.dto.CommentsDTO;
 import ru.skypro.homework.dto.CreateOrUpdateCommentDTO;
+import ru.skypro.homework.service.impl.CommentServiceImpl;
 
 @RestController
 @CrossOrigin(value = "http://localhost:3000")
 @RequestMapping("/ads")
 public class CommentController {
+    CommentServiceImpl commentService;
+
+    public CommentController(CommentServiceImpl commentService) {
+        this.commentService = commentService;
+    }
 
     @GetMapping("/{id}/comments")
     public ResponseEntity<CommentsDTO> getComments(@PathVariable Integer id) {
-//        Comments comments = commentService.getComments(id);
-        return ResponseEntity.ok().build();
+        CommentsDTO comments = commentService.getComments(id);
+        return ResponseEntity.ok(comments);
     }
 
     @PostMapping("/{id}/comments")
