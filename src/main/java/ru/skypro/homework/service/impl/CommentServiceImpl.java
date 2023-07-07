@@ -7,15 +7,17 @@ import ru.skypro.homework.dto.CreateOrUpdateCommentDTO;
 import ru.skypro.homework.entity.AdEntity;
 import ru.skypro.homework.entity.Comment;
 import ru.skypro.homework.entity.User;
+import ru.skypro.homework.exception.NoSuchAdException;
+import ru.skypro.homework.exception.NoSuchCommentException;
 import ru.skypro.homework.repository.AdRepository;
 import ru.skypro.homework.repository.CommentRepository;
 import ru.skypro.homework.repository.UserRepository;
+import ru.skypro.homework.service.CommentService;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
-public class CommentServiceImpl {
+public class CommentServiceImpl implements CommentService {
     CommentRepository commentRepository;
     AdRepository adRepository;
     UserRepository userRepository;
@@ -24,18 +26,45 @@ public class CommentServiceImpl {
         this.commentRepository = commentRepository;
     }
 
+    @Override
     public CommentsDTO getComments(Integer id) {
-        AdEntity ad = adRepository.findById(id).orElseThrow(()-> new RuntimeException("A such ad not found"));
+        AdEntity ad = adRepository.findById(id).orElseThrow(NoSuchAdException::new);
         List<Comment> allByAd = commentRepository.findAllByAd(ad);
         return mapToCommentsDTO(allByAd);
     }
 
-    public void addComment(Integer id, CreateOrUpdateCommentDTO commentDTO) {
-        AdEntity ad = adRepository.findById(id).orElseThrow(()-> new RuntimeException("A such ad not found"));
-        ad.addComment(mapToCommentFromCreateOrUpdateCommentDTO(commentDTO));
+    @Override
+    public CreateOrUpdateCommentDTO addComment(Integer id, CreateOrUpdateCommentDTO commentDTO) {
+        AdEntity ad = adRepository.findById(id).orElseThrow(NoSuchAdException::new);
+        return ad.addComment(mapToCommentFromCreateOrUpdateCommentDTO(commentDTO));
     }
 
-    private Comment mapToCommentFromCommentDTO(CommentDTO commentDTO) {
+    @Override
+    public boolean deleteComment(Integer adId, Integer commentId) {
+        if (!adRepository.existsById(adId)) {
+            throw new NoSuchAdException(); // или return false?
+        } else if (!commentRepository.existsById(Long.valueOf(commentId))) {
+            throw new NoSuchCommentException(); // или return false?
+        }
+        commentRepository.deleteById(Long.valueOf(commentId));
+        return true;
+    }
+
+    @Override
+    public Comment updateComment(Integer adId, Integer commentId, String textOfNewComment) {
+        if (!adRepository.existsById(adId)) {
+            throw new NoSuchAdException();
+        } else if (!commentRepository.existsById(Long.valueOf(commentId))) {
+            throw new NoSuchCommentException();
+        }
+        Comment comment = commentRepository.getCommentById(commentId);
+        comment.setText(textOfNewComment);
+        return comment;
+    }
+
+
+    @Override
+    public Comment mapToCommentFromCommentDTO(CommentDTO commentDTO) {
         Comment comment = new Comment();
         User author= userRepository.findById(commentDTO.getAuthor().longValue()).orElse(null);
         comment.setAuthor(author);

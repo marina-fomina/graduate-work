@@ -1,5 +1,6 @@
 package ru.skypro.homework.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.skypro.homework.dto.CommentsDTO;
@@ -20,21 +21,32 @@ public class CommentController {
     public ResponseEntity<CommentsDTO> getComments(@PathVariable Integer id) {
         CommentsDTO comments = commentService.getComments(id);
         return ResponseEntity.ok(comments);
+        // добавить сценарий для ошибки 404
     }
 
     @PostMapping("/{id}/comments")
-    public ResponseEntity<Void> addComment(@PathVariable Integer id, @RequestBody CreateOrUpdateCommentDTO comment) {
+    public ResponseEntity<CreateOrUpdateCommentDTO> addComment(@PathVariable Integer id,
+                                                               @RequestBody CreateOrUpdateCommentDTO comment) {
+        commentService.addComment(id, comment);
         return ResponseEntity.ok().build();
+        // добавить сценарий для ошибки 404
     }
 
     @DeleteMapping("/{adId}/comments/{commentId}")
     public ResponseEntity<Void> deleteComment(@PathVariable Integer adId, @PathVariable Integer commentId) {
-        return ResponseEntity.ok().build();
+        if (commentService.deleteComment(adId, commentId)) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
     }
 
     @PatchMapping("/{adId}/comments/{commentId}")
-    public ResponseEntity<Void> updateComment(@PathVariable Integer adId, @PathVariable Integer commentId,
-                                              @RequestBody CreateOrUpdateCommentDTO comment) {
+    public ResponseEntity<CreateOrUpdateCommentDTO> updateComment(@PathVariable Integer adId,
+                                                                  @PathVariable Integer commentId,
+                                                                  @RequestBody CreateOrUpdateCommentDTO comment) {
+        commentService.updateComment(adId, commentId, comment.getText());
         return ResponseEntity.ok().build();
+        // добавить сценарий для ошибки 403
     }
 }

@@ -2,7 +2,7 @@ package ru.skypro.homework.entity;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Value;
+import ru.skypro.homework.dto.CreateOrUpdateCommentDTO;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -29,12 +29,13 @@ public class AdEntity {
     private List<Comment> comments;
 
     //  метод для установки связи
-    public void addComment(Comment comment) {
+    public CreateOrUpdateCommentDTO addComment(Comment comment) {
         if (comments == null) {
             comments = new ArrayList<>();
         }
 
         comments.add(comment);
         comment.setAd(this);
+        return null;
     }
 }
