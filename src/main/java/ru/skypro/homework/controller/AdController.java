@@ -2,6 +2,7 @@ package ru.skypro.homework.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +12,9 @@ import ru.skypro.homework.dto.AdsDTO;
 import ru.skypro.homework.dto.CreateOrUpdateAdDTO;
 import ru.skypro.homework.dto.ExtendedAdDTO;
 import ru.skypro.homework.service.AdService;
+import ru.skypro.homework.utils.AdMapping;
+
+import java.util.Optional;
 
 @RestController
 @CrossOrigin(value = "http://localhost:3000")
@@ -18,6 +22,8 @@ import ru.skypro.homework.service.AdService;
 public class AdController {
     @Autowired
     AdService adService;
+    @Autowired
+    AdMapping adMapping;
 
     @GetMapping
     public ResponseEntity<AdsDTO> getAds() {
@@ -27,27 +33,19 @@ public class AdController {
 
     @PostMapping
     public ResponseEntity<AdDTO> addAd(Authentication authentication,
-                                       @RequestParam MultipartFile image,
-                                       @RequestParam Integer price,
-                                       @RequestParam String title) {
+                                       @RequestPart(name = "properties") CreateOrUpdateAdDTO createOrUpdateAdDTO,
+                                       @RequestPart MultipartFile image) {
         // Сохранение image в репозиторий пользователя
         String imageLink = adService.saveImage(image);
 
-        // Формируем DTO
-        AdDTO adDto = new AdDTO();
-        adDto.setTitle(title);
-        adDto.setPrice(price);
-        adDto.setImage(imageLink);
-
-        //Передача в service
-        adService.addAd(adDto);
-        return new ResponseEntity<>(adDto, HttpStatus.CREATED);
+        ExtendedAdDTO extendedAdDTO = adMapping.mapCreateOrUpdateAdToExtendedAd(createOrUpdateAdDTO, imageLink);
+        return new ResponseEntity<>(adService.addAd(extendedAdDTO), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ExtendedAdDTO> getAdById(@PathVariable Integer id) {
-        ExtendedAdDTO extendedAdDTO = adService.getAdById(id);
-        return ResponseEntity.ok(extendedAdDTO);
+        Optional<ExtendedAdDTO> extendedAdDTO = Optional.ofNullable(adService.getAdById(id));
+        return extendedAdDTO.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
@@ -74,7 +72,7 @@ public class AdController {
 
     @PatchMapping("/{id}/image")
     public ResponseEntity<String> updateImage(@PathVariable Integer id,
-                                               @RequestParam MultipartFile image) {
+                                              @RequestParam MultipartFile image) {
         String imageLink = adService.saveImage(id, image);
         return imageLink == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(imageLink);
     }

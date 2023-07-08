@@ -48,19 +48,15 @@ public class AdServiceImpl implements AdService {
     }
 
     @Override
-    public void addAd(AdDTO adDTO) {
-        Ad ad = new AdMapping().mapDtoToAdEntity(adDTO);
-        adRepository.save(ad);
+    public AdDTO addAd(ExtendedAdDTO extendedAdDTO) {
+        Ad ad = adRepository.save(adMapping.mapExtendedAdToAdEntity(extendedAdDTO));
+        return adMapping.mapEntityToAdDto(ad);
     }
 
     @Override
     public ExtendedAdDTO getAdById(Integer id) {
-        ExtendedAdDTO extendedAdDTO = new ExtendedAdDTO();
         Optional<Ad> adEntity = adRepository.findById(id);
-        if (adEntity.isPresent()) {
-            extendedAdDTO = adMapping.mapEntityToExtendedAdDto(adEntity.get());
-        }
-        return extendedAdDTO;
+        return adEntity.map(ad -> adMapping.mapEntityToExtendedAdDto(ad)).orElse(null);
     }
 
     @Override

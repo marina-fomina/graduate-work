@@ -9,7 +9,7 @@ import ru.skypro.homework.dto.ExtendedAdDTO;
 public interface AdService {
     AdsDTO getAds();
 
-    void addAd(AdDTO adDTO);
+    AdDTO addAd(ExtendedAdDTO extendedAdDTO);
 
     AdDTO patchAd(Integer id, CreateOrUpdateAdDTO createOrUpdateAdDTO);
 

@@ -48,31 +48,40 @@ public class AdMapping {
         return extendedAdDto;
     }
 
-    public CreateOrUpdateAdDTO mapEntityToCreateOrUpdateAd(Ad ad) {
-        CreateOrUpdateAdDTO createOrUpdateAdDTO = new CreateOrUpdateAdDTO();
-        createOrUpdateAdDTO.setTitle(ad.getTitle());
-        createOrUpdateAdDTO.setPrice(ad.getPrice());
-        createOrUpdateAdDTO.setDescription(ad.getDescription());
-        return createOrUpdateAdDTO;
+//    public CreateOrUpdateAdDTO mapEntityToCreateOrUpdateAd(Ad ad) {
+//        CreateOrUpdateAdDTO createOrUpdateAdDTO = new CreateOrUpdateAdDTO();
+//        createOrUpdateAdDTO.setTitle(ad.getTitle());
+//        createOrUpdateAdDTO.setPrice(ad.getPrice());
+//        createOrUpdateAdDTO.setDescription(ad.getDescription());
+//        return createOrUpdateAdDTO;
+//    }
+
+//    public Ad mapCreateOrUpdateAdToEntity(CreateOrUpdateAdDTO ad) {
+//        Ad adEntity = new Ad();
+//        adEntity.setTitle(ad.getTitle());
+//        adEntity.setPrice(ad.getPrice());
+//        adEntity.setDescription(ad.getDescription());
+//        return adEntity;
+//    }
+
+    public ExtendedAdDTO mapCreateOrUpdateAdToExtendedAd(CreateOrUpdateAdDTO createOrUpdateAdDTO, String imageLink) {
+        ExtendedAdDTO extendedAdDTO = new ExtendedAdDTO();
+        extendedAdDTO.setTitle(createOrUpdateAdDTO.getTitle());
+        extendedAdDTO.setPrice(createOrUpdateAdDTO.getPrice());
+        extendedAdDTO.setDescription(createOrUpdateAdDTO.getDescription());
+        extendedAdDTO.setImage(imageLink);
+        return extendedAdDTO;
     }
 
-    public Ad mapCreateOrUpdateAdToEntity(CreateOrUpdateAdDTO ad) {
-        Ad adEntity = new Ad();
-        adEntity.setTitle(ad.getTitle());
-        adEntity.setPrice(ad.getPrice());
-        adEntity.setDescription(ad.getDescription());
-        return adEntity;
-    }
-
-    public Ad mapDtoToAdEntity(AdDTO adDTO) {
+    public Ad mapExtendedAdToAdEntity(ExtendedAdDTO extendedAdDTO) {
         Ad ad = new Ad();
         // TODO: дописать
-        ad.setAuthor(null);
-        ad.setDescription(null);
+        ad.setAuthor(1);
 
-        ad.setTitle(adDTO.getTitle());
-        ad.setPrice(adDTO.getPrice());
-        ad.setImage(adDTO.getImage());
+        ad.setDescription(extendedAdDTO.getDescription());
+        ad.setTitle(extendedAdDTO.getTitle());
+        ad.setPrice(extendedAdDTO.getPrice());
+        ad.setImage(extendedAdDTO.getImage());
         return ad;
     }
 }
