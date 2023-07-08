@@ -62,7 +62,9 @@ public class AdServiceImpl implements AdService {
     @Override
     public boolean deleteAd(Integer id) {
         boolean flag = adRepository.existsById(id);
-        adRepository.deleteById(id);
+        if (flag) {
+            adRepository.deleteById(id);
+        }
         return flag;
     }
     @Override

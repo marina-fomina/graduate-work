@@ -50,11 +50,7 @@ public class AdController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteAd(@PathVariable Integer id) {
-        if (adService.deleteAd(id)) {
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return adService.deleteAd(id) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 
     @PatchMapping("/{id}")
