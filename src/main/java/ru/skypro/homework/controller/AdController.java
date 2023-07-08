@@ -14,6 +14,7 @@ import ru.skypro.homework.dto.ExtendedAdDTO;
 import ru.skypro.homework.service.AdService;
 import ru.skypro.homework.utils.AdMapping;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
@@ -56,8 +57,8 @@ public class AdController {
     @PatchMapping("/{id}")
     public ResponseEntity<AdDTO> patchAd(@PathVariable Integer id,
                                          @RequestBody CreateOrUpdateAdDTO createOrUpdateAdDTO) {
-        adService.patchAd(id, createOrUpdateAdDTO);
-        return ResponseEntity.ok().build();
+        AdDTO adDTO = adService.patchAd(id, createOrUpdateAdDTO);
+        return Objects.nonNull(adDTO) ? ResponseEntity.ok(adDTO) : ResponseEntity.notFound().build();
     }
 
     @GetMapping("/me")

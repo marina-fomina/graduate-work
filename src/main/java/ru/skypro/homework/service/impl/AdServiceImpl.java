@@ -22,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -69,16 +70,15 @@ public class AdServiceImpl implements AdService {
     }
     @Override
     public AdDTO patchAd(Integer id, CreateOrUpdateAdDTO createOrUpdateAdDTO) {
-        // TODO:
-        //  1) разобраться с классами CreateOrUpdateAd и Ad
-        //  2) как не затереть лишнее
-//        Optional<AdEntity> adEntity = adRepository.findById(id);
-//        if (adEntity.isPresent()) {
-//            adEntity.get().set
-//        }
-//        AdEntity adEntity = adMapping.mapCreateOrUpdateAdToEntity(createOrUpdateAd);
-//        adRepository.save(adEntity);
-//        return adMapping.mapEntityToAdDto(adEntity);
+        // TODO: как не затереть лишнее?
+        Optional<Ad> ad = adRepository.findById(id);
+        ExtendedAdDTO adDto = ad.map(a -> adMapping.mapEntityToExtendedAdDto(a)).orElse(null);
+        if (Objects.nonNull(adDto)) {
+            adDto.setTitle(createOrUpdateAdDTO.getTitle());
+            adDto.setPrice(createOrUpdateAdDTO.getPrice());
+            adDto.setDescription(createOrUpdateAdDTO.getDescription());
+            return adMapping.mapEntityToAdDto(adRepository.save(adMapping.mapExtendedAdToAdEntity(adDto)));
+        }
         return null;
     }
 
