@@ -28,14 +28,14 @@ public class User {
 
     @Column(nullable = false, length = 24)
     private String password;
-
-    @Column
+    // TODO: переименовал имена таблиц и добавил ограничения длинны
+    @Column(name = "first_name", length = 32)
     private String firstName;
 
-    @Column
+    @Column(name = "last_name", length = 32)
     private String lastName;
 
-    @Column
+    @Column(length = 20)
     private String phone;
 
     @Column

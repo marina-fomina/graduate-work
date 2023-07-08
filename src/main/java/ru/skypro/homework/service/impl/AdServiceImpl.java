@@ -11,7 +11,7 @@ import ru.skypro.homework.dto.AdDTO;
 import ru.skypro.homework.dto.AdsDTO;
 import ru.skypro.homework.dto.CreateOrUpdateAdDTO;
 import ru.skypro.homework.dto.ExtendedAdDTO;
-import ru.skypro.homework.entity.AdEntity;
+import ru.skypro.homework.entity.Ad;
 import ru.skypro.homework.repository.AdRepository;
 import ru.skypro.homework.service.AdService;
 import ru.skypro.homework.utils.AdMapping;
@@ -43,20 +43,20 @@ public class AdServiceImpl implements AdService {
     //    }
     @Override
     public AdsDTO getAds() {
-        List<AdEntity> entityList = adRepository.findAll();
+        List<Ad> entityList = adRepository.findAll();
         return adMapping.mapEntityListToAdsDto(entityList);
     }
 
     @Override
     public void addAd(AdDTO adDTO) {
-        AdEntity adEntity = new AdMapping().mapDtoToAdEntity(adDTO);
-        adRepository.save(adEntity);
+        Ad ad = new AdMapping().mapDtoToAdEntity(adDTO);
+        adRepository.save(ad);
     }
 
     @Override
     public ExtendedAdDTO getAdById(Integer id) {
         ExtendedAdDTO extendedAdDTO = new ExtendedAdDTO();
-        Optional<AdEntity> adEntity = adRepository.findById(id);
+        Optional<Ad> adEntity = adRepository.findById(id);
         if (adEntity.isPresent()) {
             extendedAdDTO = adMapping.mapEntityToExtendedAdDto(adEntity.get());
         }
@@ -99,7 +99,7 @@ public class AdServiceImpl implements AdService {
     }
     @Override
     public String saveImage(Integer id, MultipartFile file) {
-        Optional<AdEntity> entity = adRepository.findById(id);
+        Optional<Ad> entity = adRepository.findById(id);
         if (entity.isPresent()) {
             deleteImage(entity.get().getImage());
             Path path = Paths.get(saveImage(file));

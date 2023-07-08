@@ -5,14 +5,14 @@ import ru.skypro.homework.dto.AdDTO;
 import ru.skypro.homework.dto.AdsDTO;
 import ru.skypro.homework.dto.CreateOrUpdateAdDTO;
 import ru.skypro.homework.dto.ExtendedAdDTO;
-import ru.skypro.homework.entity.AdEntity;
+import ru.skypro.homework.entity.Ad;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
 
 @Service
 public class AdMapping {
-    public AdDTO mapEntityToAdDto(AdEntity ad) {
+    public AdDTO mapEntityToAdDto(Ad ad) {
         AdDTO adDto = new AdDTO();
         adDto.setPk(ad.getId());
         adDto.setAuthor(ad.getAuthor());
@@ -22,14 +22,14 @@ public class AdMapping {
         return adDto;
     }
 
-    public AdsDTO mapEntityListToAdsDto(Collection<AdEntity> ad) {
+    public AdsDTO mapEntityListToAdsDto(Collection<Ad> ad) {
         AdsDTO adsDto = new AdsDTO();
         adsDto.setCount(ad.size());
         adsDto.setResults(ad.stream().map(this::mapEntityToAdDto).collect(Collectors.toList()));
         return adsDto;
     }
 
-    public ExtendedAdDTO mapEntityToExtendedAdDto(AdEntity ad) {
+    public ExtendedAdDTO mapEntityToExtendedAdDto(Ad ad) {
         ExtendedAdDTO extendedAdDto = new ExtendedAdDTO();
         extendedAdDto.setPk(ad.getId());
         extendedAdDto.setDescription(ad.getDescription());
@@ -48,7 +48,7 @@ public class AdMapping {
         return extendedAdDto;
     }
 
-    public CreateOrUpdateAdDTO mapEntityToCreateOrUpdateAd(AdEntity ad) {
+    public CreateOrUpdateAdDTO mapEntityToCreateOrUpdateAd(Ad ad) {
         CreateOrUpdateAdDTO createOrUpdateAdDTO = new CreateOrUpdateAdDTO();
         createOrUpdateAdDTO.setTitle(ad.getTitle());
         createOrUpdateAdDTO.setPrice(ad.getPrice());
@@ -56,23 +56,23 @@ public class AdMapping {
         return createOrUpdateAdDTO;
     }
 
-    public AdEntity mapCreateOrUpdateAdToEntity(CreateOrUpdateAdDTO ad) {
-        AdEntity adEntity = new AdEntity();
+    public Ad mapCreateOrUpdateAdToEntity(CreateOrUpdateAdDTO ad) {
+        Ad adEntity = new Ad();
         adEntity.setTitle(ad.getTitle());
         adEntity.setPrice(ad.getPrice());
         adEntity.setDescription(ad.getDescription());
         return adEntity;
     }
 
-    public AdEntity mapDtoToAdEntity(AdDTO adDTO) {
-        AdEntity adEntity = new AdEntity();
+    public Ad mapDtoToAdEntity(AdDTO adDTO) {
+        Ad ad = new Ad();
         // TODO: дописать
-        adEntity.setAuthor(null);
-        adEntity.setDescription(null);
+        ad.setAuthor(null);
+        ad.setDescription(null);
 
-        adEntity.setTitle(adDTO.getTitle());
-        adEntity.setPrice(adDTO.getPrice());
-        adEntity.setImage(adDTO.getImage());
-        return adEntity;
+        ad.setTitle(adDTO.getTitle());
+        ad.setPrice(adDTO.getPrice());
+        ad.setImage(adDTO.getImage());
+        return ad;
     }
 }

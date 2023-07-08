@@ -22,7 +22,7 @@ public class Comment {
 
     @ManyToOne
     @JoinColumn(name = "ad_id", nullable = false)
-    private AdEntity ad;
+    private Ad ad;
 
     private String text;
 

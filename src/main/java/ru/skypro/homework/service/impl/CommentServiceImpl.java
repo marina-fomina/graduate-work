@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import ru.skypro.homework.dto.CommentDTO;
 import ru.skypro.homework.dto.CommentsDTO;
 import ru.skypro.homework.dto.CreateOrUpdateCommentDTO;
-import ru.skypro.homework.entity.AdEntity;
+import ru.skypro.homework.entity.Ad;
 import ru.skypro.homework.entity.Comment;
 import ru.skypro.homework.entity.User;
 import ru.skypro.homework.exception.NoSuchAdException;
@@ -28,14 +28,14 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public CommentsDTO getComments(Integer id) {
-        AdEntity ad = adRepository.findById(id).orElseThrow(NoSuchAdException::new);
+        Ad ad = adRepository.findById(id).orElseThrow(NoSuchAdException::new);
         List<Comment> allByAd = commentRepository.findAllByAd(ad);
         return mapToCommentsDTO(allByAd);
     }
 
     @Override
     public CreateOrUpdateCommentDTO addComment(Integer id, CreateOrUpdateCommentDTO commentDTO) {
-        AdEntity ad = adRepository.findById(id).orElseThrow(NoSuchAdException::new);
+        Ad ad = adRepository.findById(id).orElseThrow(NoSuchAdException::new);
         return ad.addComment(mapToCommentFromCreateOrUpdateCommentDTO(commentDTO));
     }
 

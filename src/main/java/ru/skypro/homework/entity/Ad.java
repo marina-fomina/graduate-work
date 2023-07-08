@@ -12,15 +12,15 @@ import java.util.List;
 @Getter
 @Setter
 @Table(name = "ads")
-public class AdEntity {
+public class Ad {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column(name = "author_id")
+    @Column(name = "author_id", nullable = false)
     private Integer author;
     String image;
     Integer price;
-    @Column(length = 100)
+    @Column(nullable = false, length = 100)
     String title;
     @Column(length = 1024)
     String description;

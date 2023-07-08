@@ -5,25 +5,29 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
 
-    <changeSet id="create-ads-table.1" author="Anton Scherbakov">
+    <changeSet id="create-users-table.1" author="Anton Scherbakov">
         <preConditions>
             <not>
-                <tableExists tableName="ads"/>
+                <tableExists tableName="users"/>
             </not>
         </preConditions>
-        <createTable tableName="ads">
-            <column name="id" type="INTEGER" autoIncrement="true">
+        <createTable tableName="users">
+            <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true"/>
             </column>
-            <column name="author_id" type="INTEGER">
+            <column name="username" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="VARCHAR(24)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="first_name" type="VARCHAR(32)"/>
+            <column name="last_name" type="VARCHAR(32)"/>
+            <column name="phone" type="VARCHAR(20)"/>
+            <column name="role" type="INTEGER">
                 <constraints nullable="false"/>
             </column>
             <column name="image" type="TEXT"/>
-            <column name="price" type="INTEGER"/>
-            <column name="title" type="VARCHAR(100)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="description" type="TEXT"/>
         </createTable>
     </changeSet>
 
