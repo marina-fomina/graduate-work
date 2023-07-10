@@ -11,9 +11,11 @@ import ru.skypro.homework.dto.AdDTO;
 import ru.skypro.homework.dto.AdsDTO;
 import ru.skypro.homework.dto.CreateOrUpdateAdDTO;
 import ru.skypro.homework.dto.ExtendedAdDTO;
+import ru.skypro.homework.model.Image;
 import ru.skypro.homework.service.AdService;
 import ru.skypro.homework.utils.AdMapping;
 
+import java.io.FileNotFoundException;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -41,6 +43,19 @@ public class AdController {
 
         ExtendedAdDTO extendedAdDTO = adMapping.mapCreateOrUpdateAdToExtendedAd(createOrUpdateAdDTO, imageLink);
         return new ResponseEntity<>(adService.addAd(extendedAdDTO), HttpStatus.CREATED);
+    }
+    // TODO: Что за *****, что и как я должен вернуть для отображения картинки???
+    @GetMapping("/image")
+    public ResponseEntity<byte[]> getImage(String path) {
+        String filePath = path.substring(1);
+        System.out.println(filePath);
+        try {
+//            return ResponseEntity.ok(adService.getImage(filePath));
+            Image image = adService.getImage(filePath);
+            return ResponseEntity.ok().contentType(image.getMediaType()).body(image.getBytes());
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @GetMapping("/{id}")

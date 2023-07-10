@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,6 +13,7 @@ import ru.skypro.homework.dto.AdsDTO;
 import ru.skypro.homework.dto.CreateOrUpdateAdDTO;
 import ru.skypro.homework.dto.ExtendedAdDTO;
 import ru.skypro.homework.entity.Ad;
+import ru.skypro.homework.model.Image;
 import ru.skypro.homework.repository.AdRepository;
 import ru.skypro.homework.service.AdService;
 import ru.skypro.homework.utils.AdMapping;
@@ -107,6 +109,27 @@ public class AdServiceImpl implements AdService {
         } else {
             logger.info("Not found Ad with id: {}", id);
             return null;
+        }
+    }
+    @Override
+    public Image getImage(String path) {
+//        Map<MediaType, Byte[]> mapImage = new HashMap<>();
+        Image image = new Image();
+        try {
+            switch(StringUtils.getFilenameExtension(path)) {
+                case "png":
+                    image.setMediaType(MediaType.IMAGE_PNG);
+                    image.setBytes(Files.readAllBytes(Path.of(path)));
+                    break;
+                case "jpg":
+                    image.setMediaType(MediaType.IMAGE_JPEG);
+                    image.setBytes(Files.readAllBytes(Path.of(path)));
+                    break;
+            }
+//            return Files.readAllBytes(Path.of(path));
+            return image;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
     private void deleteImage(String image) {

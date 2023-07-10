@@ -7,16 +7,24 @@ import ru.skypro.homework.dto.CreateOrUpdateAdDTO;
 import ru.skypro.homework.dto.ExtendedAdDTO;
 import ru.skypro.homework.entity.Ad;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
 @Service
 public class AdMapping {
+    private final String imagePrefix = "/ads/image?path=/";
     public AdDTO mapEntityToAdDto(Ad ad) {
         AdDTO adDto = new AdDTO();
         adDto.setPk(ad.getId());
         adDto.setAuthor(ad.getAuthor());
-        adDto.setImage(ad.getImage());
+//        adDto.setImage(ad.getImage());
+        adDto.setImage(imagePrefix + ad.getImage().replace("\\", "/"));
+        System.out.println(adDto.getImage());
         adDto.setTitle(ad.getTitle());
         adDto.setPrice(ad.getPrice());
         return adDto;
@@ -33,7 +41,7 @@ public class AdMapping {
         ExtendedAdDTO extendedAdDto = new ExtendedAdDTO();
         extendedAdDto.setPk(ad.getId());
         extendedAdDto.setDescription(ad.getDescription());
-        extendedAdDto.setImage(ad.getImage());
+        extendedAdDto.setImage(imagePrefix + ad.getImage().replace("\\", "/"));
         extendedAdDto.setTitle(ad.getTitle());
         extendedAdDto.setPrice(ad.getPrice());
 
@@ -47,22 +55,6 @@ public class AdMapping {
 //        }
         return extendedAdDto;
     }
-
-//    public CreateOrUpdateAdDTO mapEntityToCreateOrUpdateAd(Ad ad) {
-//        CreateOrUpdateAdDTO createOrUpdateAdDTO = new CreateOrUpdateAdDTO();
-//        createOrUpdateAdDTO.setTitle(ad.getTitle());
-//        createOrUpdateAdDTO.setPrice(ad.getPrice());
-//        createOrUpdateAdDTO.setDescription(ad.getDescription());
-//        return createOrUpdateAdDTO;
-//    }
-
-//    public Ad mapCreateOrUpdateAdToEntity(CreateOrUpdateAdDTO ad) {
-//        Ad adEntity = new Ad();
-//        adEntity.setTitle(ad.getTitle());
-//        adEntity.setPrice(ad.getPrice());
-//        adEntity.setDescription(ad.getDescription());
-//        return adEntity;
-//    }
 
     public ExtendedAdDTO mapCreateOrUpdateAdToExtendedAd(CreateOrUpdateAdDTO createOrUpdateAdDTO, String imageLink) {
         ExtendedAdDTO extendedAdDTO = new ExtendedAdDTO();

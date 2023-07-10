@@ -5,7 +5,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.skypro.homework.dto.CommentsDTO;
 import ru.skypro.homework.dto.CreateOrUpdateCommentDTO;
+import ru.skypro.homework.dto.ExtendedAdDTO;
 import ru.skypro.homework.service.impl.CommentServiceImpl;
+
+import java.util.Optional;
 
 @RestController
 @CrossOrigin(value = "http://localhost:3000")
@@ -21,12 +24,15 @@ public class CommentController {
     public ResponseEntity<CommentsDTO> getComments(@PathVariable Integer id) {
         CommentsDTO comments = commentService.getComments(id);
         return ResponseEntity.ok(comments);
+//        Optional<CommentsDTO> commentsDTO = Optional.ofNullable(commentService.getComments(id));
+//        return extendedAdDTO.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
         // добавить сценарий для ошибки 404
     }
 
     @PostMapping("/{id}/comments")
     public ResponseEntity<CreateOrUpdateCommentDTO> addComment(@PathVariable Integer id,
                                                                @RequestBody CreateOrUpdateCommentDTO comment) {
+        System.out.println("START");
         commentService.addComment(id, comment);
         return ResponseEntity.ok().build();
         // добавить сценарий для ошибки 404
