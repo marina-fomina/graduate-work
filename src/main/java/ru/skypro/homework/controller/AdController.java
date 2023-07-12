@@ -2,7 +2,6 @@ package ru.skypro.homework.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -44,13 +43,11 @@ public class AdController {
         ExtendedAdDTO extendedAdDTO = adMapping.mapCreateOrUpdateAdToExtendedAd(createOrUpdateAdDTO, imageLink);
         return new ResponseEntity<>(adService.addAd(extendedAdDTO), HttpStatus.CREATED);
     }
-    // TODO: Что за *****, что и как я должен вернуть для отображения картинки???
+    // TODO: блокируется cors
     @GetMapping("/image")
     public ResponseEntity<byte[]> getImage(String path) {
         String filePath = path.substring(1);
-        System.out.println(filePath);
         try {
-//            return ResponseEntity.ok(adService.getImage(filePath));
             Image image = adService.getImage(filePath);
             return ResponseEntity.ok().contentType(image.getMediaType()).body(image.getBytes());
         } catch (FileNotFoundException e) {

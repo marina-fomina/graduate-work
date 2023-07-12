@@ -7,11 +7,6 @@ import ru.skypro.homework.dto.CreateOrUpdateAdDTO;
 import ru.skypro.homework.dto.ExtendedAdDTO;
 import ru.skypro.homework.entity.Ad;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -22,7 +17,6 @@ public class AdMapping {
         AdDTO adDto = new AdDTO();
         adDto.setPk(ad.getId());
         adDto.setAuthor(ad.getAuthor());
-//        adDto.setImage(ad.getImage());
         adDto.setImage(imagePrefix + ad.getImage().replace("\\", "/"));
         System.out.println(adDto.getImage());
         adDto.setTitle(ad.getTitle());

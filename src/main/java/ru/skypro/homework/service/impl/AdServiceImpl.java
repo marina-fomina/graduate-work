@@ -113,7 +113,7 @@ public class AdServiceImpl implements AdService {
     }
     @Override
     public Image getImage(String path) {
-//        Map<MediaType, Byte[]> mapImage = new HashMap<>();
+        // TODO: отследить null
         Image image = new Image();
         try {
             switch(StringUtils.getFilenameExtension(path)) {
@@ -126,7 +126,6 @@ public class AdServiceImpl implements AdService {
                     image.setBytes(Files.readAllBytes(Path.of(path)));
                     break;
             }
-//            return Files.readAllBytes(Path.of(path));
             return image;
         } catch (IOException e) {
             throw new RuntimeException(e);

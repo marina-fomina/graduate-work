@@ -24,15 +24,12 @@ public class CommentController {
     public ResponseEntity<CommentsDTO> getComments(@PathVariable Integer id) {
         CommentsDTO comments = commentService.getComments(id);
         return ResponseEntity.ok(comments);
-//        Optional<CommentsDTO> commentsDTO = Optional.ofNullable(commentService.getComments(id));
-//        return extendedAdDTO.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
         // добавить сценарий для ошибки 404
     }
 
     @PostMapping("/{id}/comments")
     public ResponseEntity<CreateOrUpdateCommentDTO> addComment(@PathVariable Integer id,
                                                                @RequestBody CreateOrUpdateCommentDTO comment) {
-        System.out.println("START");
         commentService.addComment(id, comment);
         return ResponseEntity.ok().build();
         // добавить сценарий для ошибки 404
