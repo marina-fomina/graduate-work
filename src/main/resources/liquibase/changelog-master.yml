@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - include:
+      file: liquibase/tables.sql
+
+  - include:
+      file: liquibase/users.sql
+
+  - include:
+      file: liquibase/ads.sql
+
+  - include:
+      file: liquibase/comments.sql

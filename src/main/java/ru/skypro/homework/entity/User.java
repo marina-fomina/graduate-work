@@ -1,6 +1,9 @@
 package ru.skypro.homework.entity;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import ru.skypro.homework.dto.Role;
 
 import javax.persistence.*;
@@ -18,31 +21,30 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @Column(nullable = false, length = 32)
     private String username; // =login, =email
 
     @Column(nullable = false, length = 24)
     private String password;
-    // TODO: переименовал имена таблиц и добавил ограничения длинны
-    @Column(name = "first_name", length = 32)
+
+    @Column(name = "first_name", length = 20)
     private String firstName;
 
-    @Column(name = "last_name", length = 32)
+    @Column(name = "last_name",length = 20)
     private String lastName;
 
-    @Column(length = 20)
+    @Column(length = 16)
     private String phone;
 
-    @Column
+    @Column(nullable = false)
     private Role role;
 
     @Column
     private String image; //ссылка на аватар пользователя
 
     @OneToMany(mappedBy="author")
-    @ToString.Exclude
     private List<Comment> comments = new ArrayList<>();
 
     @Override

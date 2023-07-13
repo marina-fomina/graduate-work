@@ -22,10 +22,12 @@ import java.util.Optional;
 @CrossOrigin(value = "http://localhost:3000")
 @RequestMapping("/ads")
 public class AdController {
+
     @Autowired
     AdService adService;
     @Autowired
     AdMapping adMapping;
+
 
     @GetMapping
     public ResponseEntity<AdsDTO> getAds() {

@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.skypro.homework.dto.CommentsDTO;
 import ru.skypro.homework.dto.CreateOrUpdateCommentDTO;
+import ru.skypro.homework.entity.Comment;
 import ru.skypro.homework.service.impl.CommentServiceImpl;
 
 import java.util.Objects;
@@ -37,16 +38,19 @@ public class CommentController {
         if (commentService.deleteComment(adId, commentId)) {
             return ResponseEntity.ok().build();
         } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
     @PatchMapping("/{adId}/comments/{commentId}")
-    public ResponseEntity<CreateOrUpdateCommentDTO> updateComment(@PathVariable Integer adId,
-                                                                  @PathVariable Integer commentId,
-                                                                  @RequestBody CreateOrUpdateCommentDTO comment) {
-        commentService.updateComment(adId, commentId, comment.getText());
-        return ResponseEntity.ok().build();
-        // добавить сценарий для ошибки 403
+    public ResponseEntity<Comment> updateComment(@PathVariable Integer adId,
+                                                 @PathVariable Integer commentId,
+                                                 @RequestBody CreateOrUpdateCommentDTO createOrUpdateCommentDTO) {
+        Comment comment = commentService.updateComment(adId, commentId, createOrUpdateCommentDTO);
+        if (Objects.nonNull(comment)) {
+            return ResponseEntity.ok(comment);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 }

@@ -12,7 +12,5 @@ public interface CommentService {
 
     boolean deleteComment(Integer adId, Integer commentId);
 
-    Comment updateComment(Integer adId, Integer commentId, String textOfNewComment);
-
-    Comment mapToCommentFromCommentDTO(CommentDTO commentDTO);
+    Comment updateComment(Integer adId, Integer commentId, CreateOrUpdateCommentDTO createOrUpdateCommentDTO);
 }
