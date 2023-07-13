@@ -1,9 +1,6 @@
 package ru.skypro.homework.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import ru.skypro.homework.dto.Role;
 
 import javax.persistence.*;
@@ -45,17 +42,8 @@ public class User {
     private String image; //ссылка на аватар пользователя
 
     @OneToMany(mappedBy="author")
-    private List<Comment> comments;
-
-    //  метод для установки связи
-    public void addComment(Comment comment) {
-        if (comments == null) {
-            comments = new ArrayList<>();
-        }
-
-        comments.add(comment);
-        comment.setAuthor(this);
-    }
+    @ToString.Exclude
+    private List<Comment> comments = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {

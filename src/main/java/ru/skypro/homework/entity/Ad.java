@@ -2,7 +2,7 @@ package ru.skypro.homework.entity;
 
 import lombok.Getter;
 import lombok.Setter;
-import ru.skypro.homework.dto.CreateOrUpdateCommentDTO;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -16,6 +16,7 @@ public class Ad {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    // TODO: переписать под пользователя
     @Column(name = "author_id", nullable = false)
     private Integer author;
     String image;
@@ -26,16 +27,6 @@ public class Ad {
     String description;
 
     @OneToMany(mappedBy="ad")
-    private List<Comment> comments;
-
-    //  метод для установки связи
-    public CreateOrUpdateCommentDTO addComment(Comment comment) {
-        if (comments == null) {
-            comments = new ArrayList<>();
-        }
-
-        comments.add(comment);
-        comment.setAd(this);
-        return null;
-    }
+    @ToString.Exclude
+    private List<Comment> comments = new ArrayList<>();
 }

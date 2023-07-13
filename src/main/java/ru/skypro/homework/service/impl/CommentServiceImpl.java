@@ -1,5 +1,6 @@
 package ru.skypro.homework.service.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.skypro.homework.dto.CommentDTO;
 import ru.skypro.homework.dto.CommentsDTO;
@@ -15,11 +16,15 @@ import ru.skypro.homework.repository.UserRepository;
 import ru.skypro.homework.service.CommentService;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class CommentServiceImpl implements CommentService {
     CommentRepository commentRepository;
+    @Autowired
     AdRepository adRepository;
+    @Autowired
     UserRepository userRepository;
 
     public CommentServiceImpl(CommentRepository commentRepository) {
@@ -29,14 +34,22 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentsDTO getComments(Integer id) {
         Ad ad = adRepository.findById(id).orElseThrow(NoSuchAdException::new);
-        List<Comment> allByAd = commentRepository.findAllByAd(ad);
-        return mapToCommentsDTO(allByAd);
+        List<Comment> list = ad.getComments();
+        return mapToCommentsDTO(list);
     }
 
     @Override
     public CreateOrUpdateCommentDTO addComment(Integer id, CreateOrUpdateCommentDTO commentDTO) {
-        Ad ad = adRepository.findById(id).orElseThrow(NoSuchAdException::new);
-        return ad.addComment(mapToCommentFromCreateOrUpdateCommentDTO(commentDTO));
+        Optional<Ad> ad =  adRepository.findById(id);
+        Comment comment = mapToCommentFromCreateOrUpdateCommentDTO(commentDTO);
+        if(ad.isPresent()) {
+            comment.setAd(ad.get());
+            // TODO: переписать под пользователя
+            comment.setAuthor(userRepository.getUserById(1L));
+            commentRepository.save(comment);
+            return new CreateOrUpdateCommentDTO(comment.getText());
+        }
+        return null;
     }
 
     @Override
@@ -83,9 +96,21 @@ public class CommentServiceImpl implements CommentService {
         return comment;
     }
 
+    private CommentDTO mapCommentToCommentDTO(Comment comment) {
+        CommentDTO commentDTO = new CommentDTO();
+        commentDTO.setAuthor(commentDTO.getAuthor());
+        commentDTO.setAuthorImage(comment.getAuthor().getImage());
+        commentDTO.setAuthorFirstName(comment.getAuthor().getFirstName());
+        // TODO: дописать дату/время
+        commentDTO.setCreatedAt(1L);
+        commentDTO.setPk(comment.getId());
+        commentDTO.setText(comment.getText());
+        return commentDTO;
+    }
+
     private CommentsDTO mapToCommentsDTO(List<Comment> comments) {
         CommentsDTO commentsDTO = new CommentsDTO();
-        commentsDTO.setComments(comments);
+        commentsDTO.setComments(comments.stream().map(this::mapCommentToCommentDTO).collect(Collectors.toList()));
         commentsDTO.setCount(comments.size());
         return commentsDTO;
     }
