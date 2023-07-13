@@ -18,12 +18,14 @@ public class AdEntity {
     private Integer id;
     @Column(name = "author_id")
     private Integer author;
-    String image;
-    Integer price;
+    @Column
+    private String image;
+    @Column
+    private Integer price;
     @Column(length = 100)
-    String title;
+    private String title;
     @Column(length = 1024)
-    String description;
+    private String description;
 
     @OneToMany(mappedBy="ad")
     private List<Comment> comments;

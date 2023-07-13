@@ -3,14 +3,13 @@ package ru.skypro.homework.service.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-import ru.skypro.homework.dto.PasswordDTO;
-import ru.skypro.homework.dto.Role;
-import ru.skypro.homework.dto.UpdateUserDTO;
-import ru.skypro.homework.dto.UserDTO;
+import ru.skypro.homework.dto.*;
 import ru.skypro.homework.entity.User;
+import ru.skypro.homework.model.Image;
 import ru.skypro.homework.repository.UserRepository;
 import ru.skypro.homework.service.UserService;
 import java.io.IOException;
@@ -18,6 +17,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -28,15 +28,22 @@ public class UserServiceImpl implements UserService {
     private String pathToImage;
     private final UserRepository userRepository;
 
+    private final String imagePrefix = "/users/image?path=/";
+
     public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
 
     @Override
-    public boolean setNewPassword(String newPassword, String currentPassword) {
-        if (newPassword != null && !newPassword.equals(currentPassword)) {
-            PasswordDTO passwordDTO = new PasswordDTO(newPassword, currentPassword);
+    public boolean setNewPassword(PasswordDTO passwordDTO,
+                                  String username) {
+        User user = userRepository.getUserByUsername(username);
+        if (user.getPassword().equals(passwordDTO.getCurrentPassword()) &&
+                passwordDTO.getNewPassword() != null &&
+                !passwordDTO.getNewPassword().equals(passwordDTO.getCurrentPassword())) {
+            user.setPassword(passwordDTO.getNewPassword());
+            userRepository.save(user);
             return true;
         } else {
             return false;
@@ -44,7 +51,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO getUser(Long id) {
+    public UserDTO getUser(Integer id) {
         return mapToUserDTO(userRepository.getUserById(id));
     }
 
@@ -54,24 +61,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String updateUserImage(MultipartFile image) {
-//        Path dir = Paths.get(image); // ???
-//        String filename = image.getName();
-//        Path file;
-//
-//        try {
-//            if (!Files.exists(dir)) {
-//                Files.createDirectory(dir);
-//            }
-//            file = Files.createFile(Paths.get(dir.toString(), filename));
-//
-//            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file.toFile()));
-//            oos.writeObject(image);
-//
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//        return filename;
+    public String updateUserImage(MultipartFile image, String username) {
+
+// TODO: Вынести работу с картинками в отдельный класс
 
         String uuid = UUID.randomUUID() + "." +
                 StringUtils.getFilenameExtension(image.getOriginalFilename());
@@ -82,27 +74,54 @@ public class UserServiceImpl implements UserService {
             logger.warn("WARN! Failed to upload file '{}' to the repository at '{}'", image.getOriginalFilename(), pathToImage);
             throw new RuntimeException(e);
         }
+
+        User user = userRepository.getUserByUsername(username);
+
+        user.setImage(String.valueOf(path));
+        userRepository.save(user);
         return path.toString();
     }
 
 
 
-    private User mapToUserFromUserDTO(UserDTO userDTO, String password, Role role) {
+
+    @Override
+    public Image getImage(String pathToImage) {
+        Image image = new Image();
+        try {
+            switch (Objects.requireNonNull(StringUtils.getFilenameExtension(pathToImage))) {
+                case "png":
+                    image.setMediaType(MediaType.IMAGE_PNG);
+                    image.setBytes(Files.readAllBytes(Path.of(pathToImage)));
+                    break;
+                case "jpg":
+                    image.setMediaType(MediaType.IMAGE_JPEG);
+                    image.setBytes(Files.readAllBytes(Path.of(pathToImage)));
+                    break;
+            }
+            return image;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+        private User mapToUserFromUserDTO(UserDTO userDTO, String password, Role role) {
         User user = new User();
 
-        user.setId(Long.valueOf(userDTO.getId()));
+        user.setId(userDTO.getId());
         user.setUsername(userDTO.getEmail());
         user.setPassword(password);
         user.setFirstName(userDTO.getFirstName());
         user.setLastName(userDTO.getLastName());
         user.setPhone(userDTO.getPhone());
         user.setRole(role);
-        user.setImage(userDTO.getImage());
+        user.setImage(imagePrefix + userDTO.getImage().replace("\\", "/"));
 
         return user;
     }
 
-    private User mapToUserFromUpdateUserDTO(UpdateUserDTO updateUserDTO, Long id, String username,
+    private User mapToUserFromUpdateUserDTO(UpdateUserDTO updateUserDTO, Integer id, String username,
                                             String password, Role role, String image) {
         User user = new User();
 
@@ -113,7 +132,7 @@ public class UserServiceImpl implements UserService {
         user.setLastName(updateUserDTO.getLastName());
         user.setPhone(user.getPhone());
         user.setRole(role);
-        user.setImage(image);
+        user.setImage(imagePrefix + image.replace("\\", "/"));
 
         return user;
     }
@@ -121,12 +140,12 @@ public class UserServiceImpl implements UserService {
     private UserDTO mapToUserDTO(User user) {
         UserDTO userDTO = new UserDTO();
 
-        userDTO.setId(Math.toIntExact(user.getId()));
+        userDTO.setId(user.getId());
         userDTO.setEmail(user.getUsername());
         userDTO.setFirstName(user.getFirstName());
         userDTO.setLastName(user.getLastName());
         userDTO.setPhone(user.getPhone());
-        userDTO.setImage(user.getImage());
+        userDTO.setImage(imagePrefix + user.getImage().replace("\\", "/"));
 
         return userDTO;
     }
@@ -139,5 +158,21 @@ public class UserServiceImpl implements UserService {
         updateUserDTO.setPhone(user.getPhone());
 
         return updateUserDTO;
+    }
+
+    @Override
+    public User mapToUserAndSave(RegisterReq req) {
+        User user = new User();
+
+        user.setUsername(req.getUsername());
+        user.setPassword(req.getPassword());
+        user.setFirstName(req.getFirstName());
+        user.setLastName(req.getLastName());
+        user.setPhone(req.getPhone());
+        user.setRole(req.getRole());
+//        user.setImage();
+
+        userRepository.save(user);
+        return user;
     }
 }

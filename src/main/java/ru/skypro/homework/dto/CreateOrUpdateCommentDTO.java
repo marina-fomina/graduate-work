@@ -1,9 +1,10 @@
 package ru.skypro.homework.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 @AllArgsConstructor
 public class CreateOrUpdateCommentDTO {
     private String text;
