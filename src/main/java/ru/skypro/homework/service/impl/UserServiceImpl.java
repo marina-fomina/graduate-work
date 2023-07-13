@@ -116,7 +116,9 @@ public class UserServiceImpl implements UserService {
         user.setLastName(userDTO.getLastName());
         user.setPhone(userDTO.getPhone());
         user.setRole(role);
-        user.setImage(imagePrefix + userDTO.getImage().replace("\\", "/"));
+        if (user.getImage() != null && !user.getImage().isBlank()) {
+            user.setImage(imagePrefix + userDTO.getImage().replace("\\", "/"));
+        }
 
         return user;
     }
@@ -132,7 +134,9 @@ public class UserServiceImpl implements UserService {
         user.setLastName(updateUserDTO.getLastName());
         user.setPhone(user.getPhone());
         user.setRole(role);
-        user.setImage(imagePrefix + image.replace("\\", "/"));
+        if (user.getImage() != null && !user.getImage().isBlank()) {
+            user.setImage(imagePrefix + image.replace("\\", "/"));
+        }
 
         return user;
     }
@@ -145,7 +149,9 @@ public class UserServiceImpl implements UserService {
         userDTO.setFirstName(user.getFirstName());
         userDTO.setLastName(user.getLastName());
         userDTO.setPhone(user.getPhone());
-        userDTO.setImage(imagePrefix + user.getImage().replace("\\", "/"));
+        if (user.getImage() != null && !user.getImage().isBlank()) {
+            userDTO.setImage(imagePrefix + user.getImage().replace("\\", "/"));
+        }
 
         return userDTO;
     }

@@ -49,7 +49,7 @@ public class CommentServiceImpl implements CommentService {
         if(ad.isPresent()) {
             comment.setAd(ad.get());
             // TODO: переписать под пользователя
-            comment.setAuthor(userRepository.getUserById(1L));
+            comment.setAuthor(userRepository.getUserById(1));
             commentRepository.save(comment);
             return new CreateOrUpdateCommentDTO(comment.getText());
         }

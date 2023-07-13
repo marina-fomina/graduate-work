@@ -17,7 +17,10 @@ public class AdMapping {
         AdDTO adDto = new AdDTO();
         adDto.setPk(ad.getId());
         adDto.setAuthor(ad.getAuthor());
-        adDto.setImage(imagePrefix + ad.getImage().replace("\\", "/"));
+        if (adDto.getImage() != null && !adDto.getImage().isBlank()) {
+            adDto.setImage(imagePrefix + ad.getImage().replace("\\", "/"));
+        }
+
         System.out.println(adDto.getImage());
         adDto.setTitle(ad.getTitle());
         adDto.setPrice(ad.getPrice());
@@ -35,7 +38,11 @@ public class AdMapping {
         ExtendedAdDTO extendedAdDto = new ExtendedAdDTO();
         extendedAdDto.setPk(ad.getId());
         extendedAdDto.setDescription(ad.getDescription());
-        extendedAdDto.setImage(imagePrefix + ad.getImage().replace("\\", "/"));
+        if (extendedAdDto.getImage() != null && !extendedAdDto.getImage().isBlank()) {
+            extendedAdDto.setImage(imagePrefix + ad.getImage().replace("\\", "/"));
+        }
+
+
         extendedAdDto.setTitle(ad.getTitle());
         extendedAdDto.setPrice(ad.getPrice());
 
