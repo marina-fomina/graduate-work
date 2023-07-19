@@ -2,6 +2,7 @@ package ru.skypro.homework.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import ru.skypro.homework.dto.CommentsDTO;
 import ru.skypro.homework.dto.CreateOrUpdateCommentDTO;
@@ -34,8 +35,11 @@ public class CommentController {
     }
 
     @DeleteMapping("/{adId}/comments/{commentId}")
-    public ResponseEntity<Void> deleteComment(@PathVariable Integer adId, @PathVariable Integer commentId) {
-        if (commentService.deleteComment(adId, commentId)) {
+    public ResponseEntity<Void> deleteComment(Authentication authentication,
+                                                 @PathVariable Integer adId,
+                                                 @PathVariable Integer commentId) {
+        String username = authentication.getName();
+        if (commentService.deleteComment(username, adId, commentId)) {
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

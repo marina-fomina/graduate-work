@@ -39,12 +39,13 @@ public class User {
     private String phone;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private Role role;
 
     @Column
     private String image; //ссылка на аватар пользователя
 
-    @OneToMany(mappedBy="author")
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
     @Override
@@ -59,4 +60,5 @@ public class User {
     public int hashCode() {
         return Objects.hash(username);
     }
+
 }

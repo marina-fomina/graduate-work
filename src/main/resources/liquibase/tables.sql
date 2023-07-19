@@ -2,21 +2,26 @@
 
 -- changeset marina:1
 
-CREATE TABLE users (
-                    id INTEGER PRIMARY KEY,
-                    username varchar(32) NOT NULL,
-                    password varchar(24) NOT NULL,
-                    first_name varchar(20),
-                    last_name varchar(20),
-                    phone varchar(16),
-                    role INTEGER NOT NULL,
-                    image varchar
-);
+CREATE TYPE role_type AS enum ('user', 'admin');
 
 -- changeset marina:2
 
+CREATE TABLE users (
+                    id SERIAL PRIMARY KEY,
+                    username varchar(32) UNIQUE NOT NULL,
+                    password varchar(24) NOT NULL,
+                    enabled INT NOT NULL,
+                    first_name varchar(20),
+                    last_name varchar(20),
+                    phone varchar(16),
+                    role role_type NOT NULL,
+                    image varchar
+);
+
+-- changeset marina:3
+
 CREATE TABLE ads (
-                    id INTEGER NOT NULL PRIMARY KEY,
+                    id SERIAL NOT NULL PRIMARY KEY,
                     author_id INTEGER NOT NULL,
                     image varchar,
                     price INTEGER,
@@ -24,19 +29,30 @@ CREATE TABLE ads (
                     description varchar(1024)
 );
 
--- changeset marina:3
+-- changeset marina:4
 
 CREATE TABLE comments (
-                    id INTEGER NOT NULL PRIMARY KEY,
+                    id SERIAL NOT NULL PRIMARY KEY,
                     author_id INTEGER NOT NULL,
                     ad_id INTEGER NOT NULL,
                     text varchar NOT NULL
 );
 
--- changeset marina:4
+-- changeset marina:5
 
 ALTER TABLE comments ADD FOREIGN KEY (author_id) REFERENCES users (id);
 
--- changeset marina:5
+-- changeset marina:6
 
 ALTER TABLE comments ADD FOREIGN KEY (ad_id) REFERENCES ads (id);
+
+-- changeset marina:7
+
+CREATE TABLE authorities (
+                    username varchar NOT NULL,
+                    authority varchar NOT NULL
+);
+
+-- changeset marina:8
+
+ALTER TABLE authorities ADD FOREIGN KEY (username) REFERENCES users(username);

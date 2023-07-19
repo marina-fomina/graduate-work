@@ -4,6 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,7 +24,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, UserDetailsService {
 
     private final Logger logger = LoggerFactory.getLogger(User.class);
     @Value("${path.to.data.file}")
@@ -81,8 +84,6 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
         return path.toString();
     }
-
-
 
 
     @Override
@@ -180,5 +181,16 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
         return user;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.getUserByUsername(username);
+        if (user == null) {
+            throw new UsernameNotFoundException("Unknown user: " + username);
+        }
+        UserDetailsDTO userDetailsDTO = new UserDetailsDTO(user.getId(), user.getUsername(),
+                                                            user.getPassword(), user.getRole());
+        return new SecurityUserPrincipal(userDetailsDTO);
     }
 }

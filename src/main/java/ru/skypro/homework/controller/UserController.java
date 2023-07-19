@@ -14,8 +14,7 @@ import ru.skypro.homework.entity.User;
 import ru.skypro.homework.model.Image;
 import ru.skypro.homework.service.AuthService;
 import ru.skypro.homework.service.UserService;
-
-import java.io.FileNotFoundException;
+import ru.skypro.homework.service.impl.SecurityUserPrincipal;
 import java.nio.file.FileAlreadyExistsException;
 
 @CrossOrigin(value = "http://localhost:3000")
@@ -24,11 +23,9 @@ import java.nio.file.FileAlreadyExistsException;
 public class UserController {
 
     private final UserService userService;
-    private final AuthService authService;
 
-    public UserController(UserService userService, AuthService authService) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.authService = authService;
     }
 
     @PostMapping("/set_password")
@@ -46,7 +43,7 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<UserDTO> getUser(Authentication authentication,
                                            @RequestParam Integer id) {
-
+        SecurityUserPrincipal principal = (SecurityUserPrincipal) authentication.getPrincipal();
         return ResponseEntity.ok(userService.getUser(id));
     }
 

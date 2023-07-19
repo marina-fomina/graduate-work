@@ -26,7 +26,7 @@ public class Ad {
     @Column(length = 1024)
     String description;
 
-    @OneToMany(mappedBy="ad")
+    @OneToMany(mappedBy = "ad", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private List<Comment> comments = new ArrayList<>();
 }

@@ -26,7 +26,7 @@ public class Comment {
     @JoinColumn(name = "ad_id", nullable = false)
     private Ad ad;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 1024)
     private String text;
 
 }

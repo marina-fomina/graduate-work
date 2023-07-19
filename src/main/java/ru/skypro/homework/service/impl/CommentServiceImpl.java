@@ -58,14 +58,34 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public boolean deleteComment(Integer adId, Integer commentId) {
-        if (!adRepository.existsById(adId)) {
-            return false;
-        } else if (!commentRepository.existsById(commentId)) {
+        if (!adRepository.existsById(adId) || !commentRepository.existsById(commentId)) {
             return false;
         } else {
             commentRepository.deleteById(commentId);
             return true;
         }
+    }
+
+    @Override
+    public boolean deleteComment(String username, Integer adId, Integer commentId) {
+        if (!isExists(adId, commentId) && !isAuthor(username, commentId)) {
+            return false;
+        } else {
+            commentRepository.deleteById(commentId);
+            return true;
+        }
+    }
+
+    private boolean isExists(Integer adId, Integer commentId) {
+        return adRepository.existsById(adId) && commentRepository.existsById(commentId);
+    }
+    private boolean isAuthor(String username, Integer commentId) {
+        return commentRepository.getCommentById(commentId).getAuthor().getId().equals(userRepository.getUserByUsername(username).getId());
+    }
+
+    @Override
+    public Integer getUserIdByCommentId(Integer commentId) {
+        return commentRepository.getCommentById(commentId).getAuthor().getId();
     }
 
     @Override
@@ -79,16 +99,6 @@ public class CommentServiceImpl implements CommentService {
             return commentRepository.save(mapToCommentFromCreateOrUpdateCommentDTO(commentDTO));
         }
         return null;
-
-//        if (!adRepository.existsById(adId)) {
-//            throw new NoSuchAdException();
-//        } else if (!commentRepository.existsById(commentId)) {
-//            throw new NoSuchCommentException();
-//        }
-//        Comment comment = commentRepository.getCommentById(commentId);
-//        comment.setText(textOfNewComment);
-//        commentRepository.save(comment);
-//        return comment;
     }
 
 
