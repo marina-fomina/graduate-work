@@ -46,6 +46,8 @@ public class User {
 
     @OneToMany(mappedBy="author")
     private List<Comment> comments = new ArrayList<>();
+    @OneToMany(mappedBy = "author")
+    private List<Ad> ads = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {

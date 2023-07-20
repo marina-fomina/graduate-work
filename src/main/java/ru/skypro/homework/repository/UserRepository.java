@@ -7,7 +7,6 @@ import ru.skypro.homework.entity.User;
 public interface UserRepository extends JpaRepository<User, Long> {
 
     User getUserById(Integer id);
-
     User getUserByUsername(String username);
 
 }

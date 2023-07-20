@@ -25,6 +25,8 @@
             </column>
             <column name="description" type="TEXT"/>
         </createTable>
+        <addForeignKeyConstraint baseTableName="ads" baseColumnNames="author_id" constraintName="FK_ADS_AUTHOR_ID" referencedTableName="users"
+                                 referencedColumnNames="id"/>
     </changeSet>
 
 </databaseChangeLog>

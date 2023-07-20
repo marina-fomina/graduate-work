@@ -72,7 +72,6 @@ public class AdServiceImpl implements AdService {
     }
     @Override
     public AdDTO patchAd(Integer id, CreateOrUpdateAdDTO createOrUpdateAdDTO) {
-        // TODO: как не затереть лишнее?
         Optional<Ad> ad = adRepository.findById(id);
         ExtendedAdDTO adDto = ad.map(a -> adMapping.mapEntityToExtendedAdDto(a)).orElse(null);
         if (Objects.nonNull(adDto)) {

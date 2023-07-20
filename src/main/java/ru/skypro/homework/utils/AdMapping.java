@@ -6,6 +6,7 @@ import ru.skypro.homework.dto.AdsDTO;
 import ru.skypro.homework.dto.CreateOrUpdateAdDTO;
 import ru.skypro.homework.dto.ExtendedAdDTO;
 import ru.skypro.homework.entity.Ad;
+import ru.skypro.homework.entity.User;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -16,7 +17,7 @@ public class AdMapping {
     public AdDTO mapEntityToAdDto(Ad ad) {
         AdDTO adDto = new AdDTO();
         adDto.setPk(ad.getId());
-        adDto.setAuthor(ad.getAuthor());
+        adDto.setAuthor(ad.getAuthor().getId());
         if (adDto.getImage() != null && !adDto.getImage().isBlank()) {
             adDto.setImage(imagePrefix + ad.getImage().replace("\\", "/"));
         }
@@ -69,7 +70,7 @@ public class AdMapping {
     public Ad mapExtendedAdToAdEntity(ExtendedAdDTO extendedAdDTO) {
         Ad ad = new Ad();
         // TODO: дописать
-        ad.setAuthor(1);
+        ad.setAuthor(new User());
 
         ad.setDescription(extendedAdDTO.getDescription());
         ad.setTitle(extendedAdDTO.getTitle());
