@@ -2,11 +2,8 @@ package ru.skypro.homework.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.skypro.homework.dto.CommentDTO;
-import ru.skypro.homework.dto.CommentsDTO;
-import ru.skypro.homework.dto.CreateOrUpdateCommentDTO;
+import ru.skypro.homework.dto.*;
 import ru.skypro.homework.entity.Ad;
-import ru.skypro.homework.dto.ExtendedAdDTO;
 import ru.skypro.homework.entity.Comment;
 import ru.skypro.homework.entity.User;
 import ru.skypro.homework.exception.NoSuchAdException;
@@ -56,6 +53,7 @@ public class CommentServiceImpl implements CommentService {
         return null;
     }
 
+    // Метод для AdminController
     @Override
     public boolean deleteComment(Integer adId, Integer commentId) {
         if (!adRepository.existsById(adId) || !commentRepository.existsById(commentId)) {
@@ -66,9 +64,10 @@ public class CommentServiceImpl implements CommentService {
         }
     }
 
+    // Метод для CommentController
     @Override
     public boolean deleteComment(String username, Integer adId, Integer commentId) {
-        if (!isExists(adId, commentId) && !isAuthor(username, commentId)) {
+        if (!ifExists(adId, commentId) && !isAuthor(username, commentId)) {
             return false;
         } else {
             commentRepository.deleteById(commentId);
@@ -76,29 +75,36 @@ public class CommentServiceImpl implements CommentService {
         }
     }
 
-    private boolean isExists(Integer adId, Integer commentId) {
-        return adRepository.existsById(adId) && commentRepository.existsById(commentId);
-    }
-    private boolean isAuthor(String username, Integer commentId) {
-        return commentRepository.getCommentById(commentId).getAuthor().getId().equals(userRepository.getUserByUsername(username).getId());
-    }
-
-    @Override
-    public Integer getUserIdByCommentId(Integer commentId) {
-        return commentRepository.getCommentById(commentId).getAuthor().getId();
-    }
 
     @Override
     public Comment updateComment(Integer adId, Integer commentId, CreateOrUpdateCommentDTO createOrUpdateCommentDTO) {
         Optional<Ad> ad = adRepository.findById(adId);
         Optional<Comment> comment = commentRepository.findById(commentId);
-        ExtendedAdDTO adDto = ad.map(a -> adMapping.mapEntityToExtendedAdDto(a)).orElse(null);
+        AdDTO adDTO = ad.map(a -> adMapping.mapEntityToAdDto(a)).orElse(null);
         CreateOrUpdateCommentDTO commentDTO = comment.map(c -> mapToCreateOrUpdateCommentDTO(c)).orElse(null);
-        if (Objects.nonNull(adDto) && Objects.nonNull(commentDTO)) {
+
+        if (Objects.nonNull(adDTO) && Objects.nonNull(commentDTO)) {
             commentDTO.setText(createOrUpdateCommentDTO.getText());
             return commentRepository.save(mapToCommentFromCreateOrUpdateCommentDTO(commentDTO));
         }
         return null;
+    }
+
+    @Override
+    public Comment updateComment(String username, Integer adId, Integer commentId,
+                                 CreateOrUpdateCommentDTO createOrUpdateCommentDTO) {
+        if (ifExists(adId, commentId) && isAuthor(username, commentId)) {
+            updateComment(adId, commentId, createOrUpdateCommentDTO);
+        }
+        return null;
+    }
+
+    private boolean ifExists(Integer adId, Integer commentId) {
+        return adRepository.existsById(adId) && commentRepository.existsById(commentId);
+    }
+
+    private boolean isAuthor(String username, Integer commentId) {
+        return commentRepository.getCommentById(commentId).getAuthor().getId().equals(userRepository.getUserByUsername(username).getId());
     }
 
 

@@ -47,10 +47,12 @@ public class CommentController {
     }
 
     @PatchMapping("/{adId}/comments/{commentId}")
-    public ResponseEntity<Comment> updateComment(@PathVariable Integer adId,
+    public ResponseEntity<Comment> updateComment(Authentication authentication,
+                                                 @PathVariable Integer adId,
                                                  @PathVariable Integer commentId,
                                                  @RequestBody CreateOrUpdateCommentDTO createOrUpdateCommentDTO) {
-        Comment comment = commentService.updateComment(adId, commentId, createOrUpdateCommentDTO);
+        String username = authentication.getName();
+        Comment comment = commentService.updateComment(username, adId, commentId, createOrUpdateCommentDTO);
         if (Objects.nonNull(comment)) {
             return ResponseEntity.ok(comment);
         } else {

@@ -13,7 +13,8 @@ public interface CommentService {
 
     boolean deleteComment(String username, Integer adId, Integer commentId);
 
-    Integer getUserIdByCommentId(Integer commentId);
-
     Comment updateComment(Integer adId, Integer commentId, CreateOrUpdateCommentDTO createOrUpdateCommentDTO);
+
+    Comment updateComment(String username, Integer adId, Integer commentId,
+                          CreateOrUpdateCommentDTO createOrUpdateCommentDTO);
 }
