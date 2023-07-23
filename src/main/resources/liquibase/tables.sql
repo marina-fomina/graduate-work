@@ -2,19 +2,15 @@
 
 -- changeset marina:1
 
-CREATE TYPE role_type AS enum ('user', 'admin');
-
--- changeset marina:2
-
 CREATE TABLE users (
                     id SERIAL PRIMARY KEY,
                     username varchar(32) UNIQUE NOT NULL,
-                    password varchar(24) NOT NULL,
-                    enabled INT NOT NULL,
+                    password varchar(255) NOT NULL,
+                    enabled boolean DEFAULT true,
                     first_name varchar(20),
                     last_name varchar(20),
                     phone varchar(16),
-                    role role_type NOT NULL,
+                    role varchar NOT NULL,
                     image varchar
 );
 
@@ -49,8 +45,8 @@ ALTER TABLE comments ADD FOREIGN KEY (ad_id) REFERENCES ads (id);
 -- changeset marina:7
 
 CREATE TABLE authorities (
-                    username varchar NOT NULL,
-                    authority varchar NOT NULL
+                             username varchar NOT NULL,
+                             authority varchar NOT NULL
 );
 
 -- changeset marina:8

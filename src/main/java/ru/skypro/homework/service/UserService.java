@@ -1,5 +1,7 @@
 package ru.skypro.homework.service;
 
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.PasswordDTO;
 import ru.skypro.homework.dto.RegisterReq;
@@ -24,5 +26,9 @@ public interface UserService {
 
     Image getImage(String pathToImage) throws FileAlreadyExistsException;
 
+    boolean userExists(String username);
+
     User mapToUserAndSave(RegisterReq req);
+
+    UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
 }

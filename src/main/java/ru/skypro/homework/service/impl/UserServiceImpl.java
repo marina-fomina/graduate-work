@@ -106,6 +106,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
     }
 
+    @Override
+    public boolean userExists(String username) {
+        return Objects.nonNull(userRepository.getUserByUsername(username));
+    }
+
 
         private User mapToUserFromUserDTO(UserDTO userDTO, String password, Role role) {
         User user = new User();
