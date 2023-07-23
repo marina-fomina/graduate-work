@@ -4,12 +4,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.*;
 import ru.skypro.homework.entity.User;
 import ru.skypro.homework.model.Image;
+import ru.skypro.homework.model.UserPrincipal;
 import ru.skypro.homework.repository.UserRepository;
 import ru.skypro.homework.service.UserService;
 import java.io.IOException;
@@ -21,7 +27,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, UserDetailsService {
 
     private final Logger logger = LoggerFactory.getLogger(User.class);
     @Value("${path.to.data.file}")
@@ -54,7 +60,11 @@ public class UserServiceImpl implements UserService {
     public UserDTO getUser(Integer id) {
         return mapToUserDTO(userRepository.getUserById(id));
     }
-
+    @Override
+    public UserDTO getUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return mapToUserDTO(userRepository.getUserByUsername(authentication.getName()));
+    }
     @Override
     public UpdateUserDTO updateUser(String newFirstName, String newLastName, String newPhone) {
         return new UpdateUserDTO(newFirstName, newLastName, newPhone);
@@ -181,4 +191,38 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
         return user;
     }
+
+    @Override
+    public UserAuthDTO mapToUserAuthDTO(User user) {
+        return new UserAuthDTO(
+                user.getId(),
+                user.getUsername(),
+                user.getPassword(),
+                user.getRole()
+        );
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.getUserByUsername(username);
+        if (user == null) {
+            throw new UsernameNotFoundException(username);
+        }
+        return new UserPrincipal(mapToUserAuthDTO(user));
+    }
+
+    @Override
+    public boolean userExists(String username) {
+        return Objects.nonNull(userRepository.getUserByUsername(username));
+    }
+
+
+//    @Override
+//    public UserDetails loadUserByUsername(String username) {
+//        User user = userRepository.getUserByUsername(username);
+//        if (user == null) {
+//            throw new UsernameNotFoundException(username);
+//        }
+//        return new UserPrincipal(user);
+//    }
 }

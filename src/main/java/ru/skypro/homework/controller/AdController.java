@@ -39,9 +39,11 @@ public class AdController {
     public ResponseEntity<AdDTO> addAd(Authentication authentication,
                                        @RequestPart(name = "properties") CreateOrUpdateAdDTO createOrUpdateAdDTO,
                                        @RequestPart MultipartFile image) {
+        System.out.println("TEST");
         // Сохранение image в репозиторий пользователя
         String imageLink = adService.saveImage(image);
-
+//        Object principal = authentication.getPrincipal();
+//        System.out.println(principal);
         ExtendedAdDTO extendedAdDTO = adMapping.mapCreateOrUpdateAdToExtendedAd(createOrUpdateAdDTO, imageLink);
         return new ResponseEntity<>(adService.addAd(extendedAdDTO), HttpStatus.CREATED);
     }
