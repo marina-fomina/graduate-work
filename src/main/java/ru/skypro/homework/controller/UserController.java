@@ -12,9 +12,7 @@ import ru.skypro.homework.dto.UpdateUserDTO;
 import ru.skypro.homework.dto.UserDTO;
 import ru.skypro.homework.entity.User;
 import ru.skypro.homework.model.Image;
-import ru.skypro.homework.service.AuthService;
 import ru.skypro.homework.service.UserService;
-import ru.skypro.homework.service.impl.SecurityUserPrincipal;
 import java.nio.file.FileAlreadyExistsException;
 
 @CrossOrigin(value = "http://localhost:3000")
@@ -41,10 +39,8 @@ public class UserController {
 
 
     @GetMapping("/me")
-    public ResponseEntity<UserDTO> getUser(Authentication authentication,
-                                           @RequestParam Integer id) {
-        SecurityUserPrincipal principal = (SecurityUserPrincipal) authentication.getPrincipal();
-        return ResponseEntity.ok(userService.getUser(id));
+    public ResponseEntity<UserDTO> getUser(Authentication authentication) {
+        return ResponseEntity.ok(userService.getUser(authentication.getName()));
     }
 
 

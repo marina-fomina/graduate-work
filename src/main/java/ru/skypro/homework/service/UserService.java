@@ -18,7 +18,7 @@ public interface UserService {
     boolean setNewPassword(PasswordDTO passwordDTO,
                            String username);
 
-    UserDTO getUser(Integer id);
+    UserDTO getUser(String username);
 
     UpdateUserDTO updateUser(String newFirstName, String newLastName, String newPhone);
 

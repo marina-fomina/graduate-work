@@ -54,8 +54,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public UserDTO getUser(Integer id) {
-        return mapToUserDTO(userRepository.getUserById(id));
+    public UserDTO getUser(String username) {
+        return mapToUserDTO(userRepository.getUserByUsername(username));
     }
 
     @Override
