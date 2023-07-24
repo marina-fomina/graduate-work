@@ -17,7 +17,7 @@ public interface UserService {
 
     UserDTO getUser(Integer id);
 
-    UserDTO getUser();
+    UserDTO getUser(String username);
 
     UpdateUserDTO updateUser(String newFirstName, String newLastName, String newPhone);
 

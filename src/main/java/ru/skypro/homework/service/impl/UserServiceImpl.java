@@ -61,9 +61,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return mapToUserDTO(userRepository.getUserById(id));
     }
     @Override
-    public UserDTO getUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return mapToUserDTO(userRepository.getUserByUsername(authentication.getName()));
+    public UserDTO getUser(String username) {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        return mapToUserDTO(userRepository.getUserByUsername(authentication.getName()));
+        return mapToUserDTO(userRepository.getUserByUsername(username));
     }
     @Override
     public UpdateUserDTO updateUser(String newFirstName, String newLastName, String newPhone) {
@@ -162,7 +163,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         if (user.getImage() != null && !user.getImage().isBlank()) {
             userDTO.setImage(imagePrefix + user.getImage().replace("\\", "/"));
         }
-
+        userDTO.setRole(user.getRole());
         return userDTO;
     }
 

@@ -44,10 +44,9 @@ public class UserController {
 
 
     @GetMapping("/me")
-    public ResponseEntity<UserDTO> getUser() {
-        UserDTO userDTO = userService.getUser();
-        System.out.println(userDTO.getEmail());
-        return ResponseEntity.ok().body(userService.getUser());
+    public ResponseEntity<UserDTO> getUser(Authentication authentication) {
+        UserDTO userDTO = userService.getUser(authentication.getName());
+        return ResponseEntity.ok().body(userDTO);
     }
 
 
