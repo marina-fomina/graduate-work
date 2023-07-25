@@ -14,8 +14,10 @@ import ru.skypro.homework.repository.AdRepository;
 import ru.skypro.homework.repository.CommentRepository;
 import ru.skypro.homework.repository.UserRepository;
 import ru.skypro.homework.service.CommentService;
+import ru.skypro.homework.service.UserService;
 import ru.skypro.homework.utils.AdMapping;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -28,6 +30,8 @@ public class CommentServiceImpl implements CommentService {
     AdRepository adRepository;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    UserService userService;
 
     AdMapping adMapping;
 
@@ -46,10 +50,10 @@ public class CommentServiceImpl implements CommentService {
     public CreateOrUpdateCommentDTO addComment(Integer id, CreateOrUpdateCommentDTO commentDTO) {
         Optional<Ad> ad =  adRepository.findById(id);
         Comment comment = mapToCommentFromCreateOrUpdateCommentDTO(commentDTO);
+        comment.setCreatedAt(Instant.now().toEpochMilli());
         if(ad.isPresent()) {
             comment.setAd(ad.get());
-            // TODO: переписать под пользователя
-            comment.setAuthor(userRepository.getUserById(1));
+            comment.setAuthor(userService.getUser().orElseThrow());
             commentRepository.save(comment);
             return new CreateOrUpdateCommentDTO(comment.getText());
         }
@@ -94,8 +98,7 @@ public class CommentServiceImpl implements CommentService {
 
     private Comment mapToCommentFromCommentDTO(CommentDTO commentDTO) {
         Comment comment = new Comment();
-        User author= userRepository.findById(commentDTO.getAuthor().longValue()).orElse(null);
-        comment.setAuthor(author);
+        comment.setAuthor(userService.getUser().orElseThrow());
         comment.setText(commentDTO.getText());
         comment.setId(commentDTO.getPk());
         return comment;
@@ -109,11 +112,10 @@ public class CommentServiceImpl implements CommentService {
 
     private CommentDTO mapCommentToCommentDTO(Comment comment) {
         CommentDTO commentDTO = new CommentDTO();
-        commentDTO.setAuthor(commentDTO.getAuthor());
+        commentDTO.setAuthor(comment.getAuthor().getId());
         commentDTO.setAuthorImage(comment.getAuthor().getImage());
         commentDTO.setAuthorFirstName(comment.getAuthor().getFirstName());
-        // TODO: дописать дату/время
-        commentDTO.setCreatedAt(1L);
+        commentDTO.setCreatedAt(comment.getCreatedAt());
         commentDTO.setPk(comment.getId());
         commentDTO.setText(comment.getText());
         return commentDTO;

@@ -22,6 +22,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="text" type="TEXT"/>
+            <column name="created_at" type="BIGINT"/>
         </createTable>
         <addForeignKeyConstraint baseTableName="comments" baseColumnNames="ad_id" constraintName="FK_COMMENTS_AD_ID" referencedTableName="ads"
                                  referencedColumnNames="id"/>

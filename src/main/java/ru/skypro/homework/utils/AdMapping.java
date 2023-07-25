@@ -1,5 +1,8 @@
 package ru.skypro.homework.utils;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import ru.skypro.homework.dto.AdDTO;
 import ru.skypro.homework.dto.AdsDTO;
@@ -7,22 +10,25 @@ import ru.skypro.homework.dto.CreateOrUpdateAdDTO;
 import ru.skypro.homework.dto.ExtendedAdDTO;
 import ru.skypro.homework.entity.Ad;
 import ru.skypro.homework.entity.User;
+import ru.skypro.homework.service.UserService;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class AdMapping {
-    private final String imagePrefix = "/ads/image?path=/";
+    @Autowired
+    UserService userService;
+    private final String imagePrefix = "/ads/image?id=";
+
     public AdDTO mapEntityToAdDto(Ad ad) {
         AdDTO adDto = new AdDTO();
         adDto.setPk(ad.getId());
         adDto.setAuthor(ad.getAuthor().getId());
-        if (adDto.getImage() != null && !adDto.getImage().isBlank()) {
-            adDto.setImage(imagePrefix + ad.getImage().replace("\\", "/"));
+        if (ad.getImage() != null && !ad.getImage().isBlank()) {
+            adDto.setImage(imagePrefix + ad.getImage());
         }
-
-        System.out.println(adDto.getImage());
         adDto.setTitle(ad.getTitle());
         adDto.setPrice(ad.getPrice());
         return adDto;
@@ -39,22 +45,15 @@ public class AdMapping {
         ExtendedAdDTO extendedAdDto = new ExtendedAdDTO();
         extendedAdDto.setPk(ad.getId());
         extendedAdDto.setDescription(ad.getDescription());
-        if (extendedAdDto.getImage() != null && !extendedAdDto.getImage().isBlank()) {
-            extendedAdDto.setImage(imagePrefix + ad.getImage().replace("\\", "/"));
+        if (ad.getImage() != null && !ad.getImage().isBlank()) {
+            extendedAdDto.setImage(imagePrefix + ad.getImage());
         }
-
-
         extendedAdDto.setTitle(ad.getTitle());
         extendedAdDto.setPrice(ad.getPrice());
-
-        // TODO: получить данные пользователя
-        // Optional<User> user = userRepository.findById(adEntity.get().getAuthor());
-//        if (user.isPresent()) {
-        extendedAdDto.setAuthorFirstName(null);
-        extendedAdDto.setAuthorLastName(null);
-        extendedAdDto.setPhone(null);
-        extendedAdDto.setEmail(null);
-//        }
+        extendedAdDto.setAuthorFirstName(ad.getAuthor().getFirstName());
+        extendedAdDto.setAuthorLastName(ad.getAuthor().getLastName());
+        extendedAdDto.setPhone(ad.getAuthor().getPhone());
+        extendedAdDto.setEmail(ad.getAuthor().getUsername());
         return extendedAdDto;
     }
 
@@ -69,9 +68,7 @@ public class AdMapping {
 
     public Ad mapExtendedAdToAdEntity(ExtendedAdDTO extendedAdDTO) {
         Ad ad = new Ad();
-        // TODO: дописать
-        ad.setAuthor(new User());
-
+        userService.getUser().ifPresent(ad::setAuthor);
         ad.setDescription(extendedAdDTO.getDescription());
         ad.setTitle(extendedAdDTO.getTitle());
         ad.setPrice(extendedAdDTO.getPrice());

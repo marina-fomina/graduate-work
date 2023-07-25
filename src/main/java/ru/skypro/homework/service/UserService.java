@@ -5,9 +5,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.*;
 import ru.skypro.homework.entity.User;
-import ru.skypro.homework.model.Image;
 
-import java.nio.file.FileAlreadyExistsException;
+import java.util.Optional;
 
 
 public interface UserService {
@@ -19,11 +18,11 @@ public interface UserService {
 
     UserDTO getUser(String username);
 
+    Optional<User> getUser();
+
     UpdateUserDTO updateUser(String newFirstName, String newLastName, String newPhone);
 
     String updateUserImage(MultipartFile image, String username);
-
-    Image getImage(String pathToImage) throws FileAlreadyExistsException;
 
     User mapToUserAndSave(RegisterReq req);
 

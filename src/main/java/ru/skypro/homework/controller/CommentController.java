@@ -41,7 +41,7 @@ public class CommentController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
-
+    // TODO: почему возвращаем comment?
     @PatchMapping("/{adId}/comments/{commentId}")
     public ResponseEntity<Comment> updateComment(@PathVariable Integer adId,
                                                  @PathVariable Integer commentId,

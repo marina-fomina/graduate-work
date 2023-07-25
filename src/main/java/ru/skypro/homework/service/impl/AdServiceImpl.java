@@ -3,47 +3,42 @@ package ru.skypro.homework.service.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.AdDTO;
 import ru.skypro.homework.dto.AdsDTO;
 import ru.skypro.homework.dto.CreateOrUpdateAdDTO;
 import ru.skypro.homework.dto.ExtendedAdDTO;
 import ru.skypro.homework.entity.Ad;
-import ru.skypro.homework.model.Image;
 import ru.skypro.homework.repository.AdRepository;
 import ru.skypro.homework.service.AdService;
+import ru.skypro.homework.service.ImageService;
+import ru.skypro.homework.service.UserService;
 import ru.skypro.homework.utils.AdMapping;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class AdServiceImpl implements AdService {
-    @Value("${file.repository}")
-    String pathToFileRepository;
     @Autowired
     AdRepository adRepository;
     @Autowired
     AdMapping adMapping;
+    @Autowired
+    UserService userService;
+    @Autowired
+    ImageService imageService;
     Logger logger = LoggerFactory.getLogger(AdServiceImpl.class);
 
-    // TODO: дописать сервис для данного эндпоинта
-    //    @GetMapping("/me")
-    //    public ResponseEntity<Ads> getUserAd(Authentication authentication) {
-    //        Ads ads = new Ads();
-    //        return ResponseEntity.ok(ads);
-    //    }
+    @Override
+    public AdsDTO getUserAds() {
+        List<Ad> entityList = adRepository.findAllByAuthor(userService.getUser().orElseThrow());
+        return adMapping.mapEntityListToAdsDto(entityList);
+    }
     @Override
     public AdsDTO getAds() {
         List<Ad> entityList = adRepository.findAll();
@@ -83,59 +78,24 @@ public class AdServiceImpl implements AdService {
         return null;
     }
 
+    /**
+     * Update ad image
+     * @param id primary key of ad
+     * @param file new image
+     * @return UUID
+     */
     @Override
-    public String saveImage(MultipartFile file) {
-        String uuid = UUID.randomUUID() + "." +
-                StringUtils.getFilenameExtension(file.getOriginalFilename());
-        Path path = Paths.get(pathToFileRepository, uuid);
-        try (OutputStream os = Files.newOutputStream(path)) {
-            os.write(file.getBytes());
-        } catch (IOException e) {
-            logger.warn("WARN! Failed to upload file '{}' to the repository at '{}'", file.getOriginalFilename(), pathToFileRepository);
-            throw new RuntimeException(e);
-        }
-        return path.toString();
-    }
-    @Override
-    public String saveImage(Integer id, MultipartFile file) {
+    public String updateAdImage(Integer id, MultipartFile file) {
         Optional<Ad> entity = adRepository.findById(id);
         if (entity.isPresent()) {
-            deleteImage(entity.get().getImage());
-            Path path = Paths.get(saveImage(file));
+            imageService.deleteImage(entity.get().getImage());
+            Path path = Paths.get(imageService.saveImage(file));
             entity.get().setImage(path.toString());
             adRepository.save(entity.get());
             return path.toString();
         } else {
             logger.info("Not found Ad with id: {}", id);
             return null;
-        }
-    }
-    @Override
-    public Image getImage(String path) {
-        // TODO: отследить null
-        Image image = new Image();
-        try {
-            switch(StringUtils.getFilenameExtension(path)) {
-                case "png":
-                    image.setMediaType(MediaType.IMAGE_PNG);
-                    image.setBytes(Files.readAllBytes(Path.of(path)));
-                    break;
-                case "jpg":
-                    image.setMediaType(MediaType.IMAGE_JPEG);
-                    image.setBytes(Files.readAllBytes(Path.of(path)));
-                    break;
-            }
-            return image;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-    private void deleteImage(String image) {
-        try {
-            Files.deleteIfExists(Path.of(image));
-            logger.info("Delete image: {}", image);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 }

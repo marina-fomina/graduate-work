@@ -13,37 +13,42 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @Configuration
 public class WebSecurityConfig {
 
-  private static final String[] AUTH_WHITELIST = {
-    "/swagger-resources/**",
-    "/swagger-ui.html",
-    "/v3/api-docs",
-    "/webjars/**",
-    "/login",
-    "/register",
-    "/ads"
-  };
+    private static final String[] AUTH_WHITELIST = {
+            "/swagger-resources/**",
+            "/swagger-ui.html",
+            "/v3/api-docs",
+            "/webjars/**",
+            "/login",
+            "/register",
+            "/ads",
+            "/ads/**",
+            "/ads/me",
+            "/ads/image/**",
+            "/image/"
+    };
 
-  @Bean
-  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    http.csrf()
-        .disable()
-        .authorizeHttpRequests(
-            (authorization) ->
-                authorization
-                    .mvcMatchers(AUTH_WHITELIST)
-                    .permitAll()
-                    .mvcMatchers(HttpMethod.GET, "/ads/image/**", "/ads", "/users/avatar/**")
-                    .permitAll()
-                    .mvcMatchers("/ads/**", "/users/**")
-                    .authenticated()
-        )
-        .cors()
-        .and()
-        .httpBasic(withDefaults());
-    return http.build();
-  }
-  @Bean
-  public PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
-  }
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.csrf()
+                .disable()
+                .authorizeHttpRequests(
+                        (authorization) ->
+                                authorization
+                                        .mvcMatchers(AUTH_WHITELIST)
+                                        .permitAll()
+                                        .mvcMatchers(HttpMethod.GET, "/ads/image/**", "/ads", "/users/avatar/**")
+                                        .permitAll()
+                                        .mvcMatchers("/ads/**", "/users/**")
+                                        .authenticated()
+                )
+                .cors()
+                .and()
+                .httpBasic(withDefaults());
+        return http.build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 }
