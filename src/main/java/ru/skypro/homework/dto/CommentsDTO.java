@@ -8,5 +8,5 @@ import java.util.List;
 @Data
 public class CommentsDTO {
     private int count;
-    private List<CommentDTO> comments = new ArrayList<>();
+    private List<CommentDTO> results = new ArrayList<>();
 }

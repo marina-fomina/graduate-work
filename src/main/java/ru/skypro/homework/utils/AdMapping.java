@@ -68,11 +68,15 @@ public class AdMapping {
 
     public Ad mapExtendedAdToAdEntity(ExtendedAdDTO extendedAdDTO) {
         Ad ad = new Ad();
+        if (extendedAdDTO.getPk() != null) {
+            ad.setId(extendedAdDTO.getPk());
+        }
         userService.getUser().ifPresent(ad::setAuthor);
         ad.setDescription(extendedAdDTO.getDescription());
         ad.setTitle(extendedAdDTO.getTitle());
         ad.setPrice(extendedAdDTO.getPrice());
-        ad.setImage(extendedAdDTO.getImage());
+        String imageId = extendedAdDTO.getImage().replace(imagePrefix, "");
+        ad.setImage(imageId);
         return ad;
     }
 }

@@ -47,14 +47,13 @@ public class AdController {
 
     @GetMapping("/image")
     public ResponseEntity<byte[]> getImage(String id) {
-         Image image = imageService.getImage(id);
+        Image image = imageService.getImage(id);
         return ResponseEntity.ok().contentType(image.getMediaType()).body(image.getBytes());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ExtendedAdDTO> getAdById(@PathVariable Integer id) {
         Optional<ExtendedAdDTO> extendedAdDTO = Optional.ofNullable(adService.getAdById(id));
-        System.out.println(extendedAdDTO.get());
         return extendedAdDTO.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 

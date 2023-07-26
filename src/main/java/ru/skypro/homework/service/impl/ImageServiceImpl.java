@@ -37,6 +37,11 @@ public class ImageServiceImpl implements ImageService {
         String uuid = UUID.randomUUID() + "." +
                 StringUtils.getFilenameExtension(file.getOriginalFilename());
         Path path = pathOfImage(uuid);
+        try {
+            Files.createDirectories(Path.of(pathToFileRepository));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         try (OutputStream os = Files.newOutputStream(path)) {
             os.write(file.getBytes());
         } catch (IOException e) {
@@ -45,60 +50,26 @@ public class ImageServiceImpl implements ImageService {
         }
         return uuid;
     }
-//    /**
-//     * Update ad image
-//     * @param id primary key of ad
-//     * @param file new image
-//     * @return UUID
-//     */
-//    @Override
-//    public String updateAdImage(Integer id, MultipartFile file) {
-//        Optional<Ad> entity = adRepository.findById(id);
-//        if (entity.isPresent()) {
-//            deleteImage(entity.get().getImage());
-//            Path path = Paths.get(saveImage(file));
-//            entity.get().setImage(path.toString());
-//            adRepository.save(entity.get());
-//            return path.toString();
-//        } else {
-//            logger.info("Not found Ad with id: {}", id);
-//            return null;
-//        }
-//    }
-
-//    @Override
-//    public String updateUserImage(String username, MultipartFile file) {
-//        Optional<User> entity = userRepository.findByUsername(username);
-//        if (entity.isPresent()) {
-//            deleteImage(entity.get().getImage());
-//            Path path = Paths.get(saveImage(file));
-//            entity.get().setImage(path.toString());
-//            userRepository.save(entity.get());
-//            return path.toString();
-//        } else {
-//            logger.info("Not found User with username: {}", username);
-//            return null;
-//        }
-//    }
     @Override
     public Image getImage(String id) {
         Image image = new Image();
+        String filename = id.replace(pathToFileRepository, "");
         try {
-            switch(Objects.requireNonNull(StringUtils.getFilenameExtension(id))) {
+            switch(Objects.requireNonNull(StringUtils.getFilenameExtension(filename))) {
                 case "png":
                     image.setMediaType(MediaType.IMAGE_PNG);
-                    image.setBytes(Files.readAllBytes(pathOfImage(id)));
+                    image.setBytes(Files.readAllBytes(pathOfImage(filename)));
                     break;
                 case "jpg":
                     image.setMediaType(MediaType.IMAGE_JPEG);
-                    image.setBytes(Files.readAllBytes(pathOfImage(id)));
+                    image.setBytes(Files.readAllBytes(pathOfImage(filename)));
                     break;
                 case "gif":
                     image.setMediaType(MediaType.IMAGE_GIF);
-                    image.setBytes(Files.readAllBytes(pathOfImage(id)));
+                    image.setBytes(Files.readAllBytes(pathOfImage(filename)));
                     break;
                 default:
-                    throw new IncorrectFileTypeException(id);
+                    throw new IncorrectFileTypeException(filename);
             }
             return image;
         } catch (IOException e) {
@@ -107,11 +78,13 @@ public class ImageServiceImpl implements ImageService {
     }
     @Override
     public void deleteImage(String image) {
-        try {
-            Files.deleteIfExists(pathOfImage(image));
-            logger.info("Delete image: {}", image);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if(image != null && !image.isBlank()) {
+            try {
+                Files.deleteIfExists(pathOfImage(image));
+                logger.info("Delete image: {}", image);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
     @Override
@@ -119,18 +92,4 @@ public class ImageServiceImpl implements ImageService {
     public Path pathOfImage(String id) {
         return Path.of(pathToFileRepository, id);
     }
-
-//    private String updateEntity(Optional<?> entity) {
-//        if (entity.isPresent() && (entity.get() instanceof Ad || entity.get() instanceof User)) {
-//            String uuid;
-//            if (entity.get() instanceof Ad) {
-//                uuid = (Ad)entity.get().getImage();
-//            }
-//            deleteImage(entity.get().getImage());
-//            Path path = Paths.get(updateAdImage(file));
-//            entity.get().setImage(path.toString());
-//            adRepository.save(entity.get());
-//            return path.toString();
-//        }
-//    }
 }

@@ -23,7 +23,9 @@ public class CommentController {
     @GetMapping("/{id}/comments")
     public ResponseEntity<CommentsDTO> getComments(@PathVariable Integer id) {
         CommentsDTO comments = commentService.getComments(id);
-        return Objects.nonNull(comments) ? ResponseEntity.ok(comments) : ResponseEntity.notFound().build();
+        // TODO: в спецификации указан возможный код ответа 404. При его реализации - объявление без коментария не отображается
+//        return comments.getCount() > 0 ? ResponseEntity.ok(comments) : ResponseEntity.notFound().build();
+        return ResponseEntity.ok(comments);
     }
 
     @PostMapping("/{id}/comments")

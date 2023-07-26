@@ -123,7 +123,7 @@ public class CommentServiceImpl implements CommentService {
 
     private CommentsDTO mapToCommentsDTO(List<Comment> comments) {
         CommentsDTO commentsDTO = new CommentsDTO();
-        commentsDTO.setComments(comments.stream().map(this::mapCommentToCommentDTO).collect(Collectors.toList()));
+        commentsDTO.setResults(comments.stream().map(this::mapCommentToCommentDTO).collect(Collectors.toList()));
         commentsDTO.setCount(comments.size());
         return commentsDTO;
     }
