@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.skypro.homework.dto.Role;
+import ru.skypro.homework.exception.IllegalPasswordLengthException;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -47,6 +48,15 @@ public class User {
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
+
+//    public void setPassword(String password) {
+//        if (password.length() >= 8 && password.length() <= 16) {
+//            this.password = password;
+//        } else {
+//            throw new IllegalPasswordLengthException("Password length should be from 8 to 16 characters");
+//        }
+//
+//    }
 
     @Override
     public boolean equals(Object o) {

@@ -6,9 +6,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
@@ -32,17 +36,18 @@ public class WebSecurityConfig {
   };
 
   @Bean
-  public UserDetailsManager userDetailsManager(DataSource dataSource,
-                                               AuthenticationManager authenticationManager) {
+  public UserDetailsService userDetailsManager(DataSource dataSource) {
     JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
-    jdbcUserDetailsManager.setAuthenticationManager(authenticationManager);
     return jdbcUserDetailsManager;
   }
 
   @Bean
-  public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
-          throws Exception {
-    return authenticationConfiguration.getAuthenticationManager();
+  public AuthenticationManager authenticationManager(UserDetailsService userDetailsManager,
+                                                     PasswordEncoder passwordEncoder) {
+    DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+    authenticationProvider.setUserDetailsService(userDetailsManager);
+    authenticationProvider.setPasswordEncoder(passwordEncoder);
+    return new ProviderManager(authenticationProvider);
   }
 
   // Бин SecurityFilterChain представляет

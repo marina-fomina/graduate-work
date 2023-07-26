@@ -7,6 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PasswordDTO {
-    private String newPassword;
-    private String currentPassword;
+
+    private String newPassword; // min 8, max 16 символов
+    private String currentPassword; // min 8, max 16 символов
 }

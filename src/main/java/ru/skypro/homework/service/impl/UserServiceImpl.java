@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,10 +32,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private String pathToImage;
     private final UserRepository userRepository;
 
+    private final PasswordEncoder encoder;
+
     private final String imagePrefix = "/users/image?path=/";
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder encoder) {
         this.userRepository = userRepository;
+        this.encoder = encoder;
     }
 
 
@@ -45,7 +49,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         if (user.getPassword().equals(passwordDTO.getCurrentPassword()) &&
                 passwordDTO.getNewPassword() != null &&
                 !passwordDTO.getNewPassword().equals(passwordDTO.getCurrentPassword())) {
-            user.setPassword(passwordDTO.getNewPassword());
+            user.setPassword(encoder.encode(passwordDTO.getNewPassword()));
             userRepository.save(user);
             return true;
         } else {

@@ -30,11 +30,8 @@ public class UserController {
     public ResponseEntity<Void> setNewPassword(Authentication authentication,
                                                @RequestBody PasswordDTO passwordDTO) {
         String username = authentication.getName();
-        if (userService.setNewPassword(passwordDTO, username)) {
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        userService.setNewPassword(passwordDTO, username);
+        return ResponseEntity.ok().build();
     }
 
 
