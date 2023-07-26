@@ -2,13 +2,12 @@ package ru.skypro.homework.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.skypro.homework.dto.AdDTO;
 import ru.skypro.homework.dto.CommentDTO;
 import ru.skypro.homework.dto.CommentsDTO;
 import ru.skypro.homework.dto.CreateOrUpdateCommentDTO;
 import ru.skypro.homework.entity.Ad;
-import ru.skypro.homework.dto.ExtendedAdDTO;
 import ru.skypro.homework.entity.Comment;
-import ru.skypro.homework.entity.User;
 import ru.skypro.homework.exception.NoSuchAdException;
 import ru.skypro.homework.repository.AdRepository;
 import ru.skypro.homework.repository.CommentRepository;
@@ -19,9 +18,9 @@ import ru.skypro.homework.utils.AdMapping;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.Objects;
 
 @Service
 public class CommentServiceImpl implements CommentService {
@@ -32,7 +31,7 @@ public class CommentServiceImpl implements CommentService {
     UserRepository userRepository;
     @Autowired
     UserService userService;
-
+    @Autowired
     AdMapping adMapping;
 
     public CommentServiceImpl(CommentRepository commentRepository) {
@@ -48,10 +47,10 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public CreateOrUpdateCommentDTO addComment(Integer id, CreateOrUpdateCommentDTO commentDTO) {
-        Optional<Ad> ad =  adRepository.findById(id);
+        Optional<Ad> ad = adRepository.findById(id);
         Comment comment = mapToCommentFromCreateOrUpdateCommentDTO(commentDTO);
         comment.setCreatedAt(Instant.now().toEpochMilli());
-        if(ad.isPresent()) {
+        if (ad.isPresent()) {
             comment.setAd(ad.get());
             comment.setAuthor(userService.getUser().orElseThrow());
             commentRepository.save(comment);
@@ -60,11 +59,22 @@ public class CommentServiceImpl implements CommentService {
         return null;
     }
 
+//    @Override
+//    public boolean deleteComment(Integer adId, Integer commentId) {
+//        if (!adRepository.existsById(adId)) {
+//            return false;
+//        } else if (!commentRepository.existsById(commentId)) {
+//            return false;
+//        } else {
+//            commentRepository.deleteById(commentId);
+//            return true;
+//        }
+//    }
+
+    // Метод для AdminController
     @Override
     public boolean deleteComment(Integer adId, Integer commentId) {
-        if (!adRepository.existsById(adId)) {
-            return false;
-        } else if (!commentRepository.existsById(commentId)) {
+        if (!adRepository.existsById(adId) || !commentRepository.existsById(commentId)) {
             return false;
         } else {
             commentRepository.deleteById(commentId);
@@ -72,29 +82,59 @@ public class CommentServiceImpl implements CommentService {
         }
     }
 
+    // Метод для CommentController
+    @Override
+    public boolean deleteComment(String username, Integer adId, Integer commentId) {
+        if (!ifExists(adId, commentId) && !isAuthor(username, commentId)) {
+            return false;
+        } else {
+            commentRepository.deleteById(commentId);
+            return true;
+        }
+    }
+
+    //    @Override
+//    public Comment updateComment(Integer adId, Integer commentId, CreateOrUpdateCommentDTO createOrUpdateCommentDTO) {
+//        Optional<Ad> ad = adRepository.findById(adId);
+//        Optional<Comment> comment = commentRepository.findById(commentId);
+//        ExtendedAdDTO adDto = ad.map(a -> adMapping.mapEntityToExtendedAdDto(a)).orElse(null);
+//        CreateOrUpdateCommentDTO commentDTO = comment.map(c -> mapToCreateOrUpdateCommentDTO(c)).orElse(null);
+//        if (Objects.nonNull(adDto) && Objects.nonNull(commentDTO)) {
+//            commentDTO.setText(createOrUpdateCommentDTO.getText());
+//            return commentRepository.save(mapToCommentFromCreateOrUpdateCommentDTO(commentDTO));
+//        }
+//        return null;
+//    }
     @Override
     public Comment updateComment(Integer adId, Integer commentId, CreateOrUpdateCommentDTO createOrUpdateCommentDTO) {
         Optional<Ad> ad = adRepository.findById(adId);
         Optional<Comment> comment = commentRepository.findById(commentId);
-        ExtendedAdDTO adDto = ad.map(a -> adMapping.mapEntityToExtendedAdDto(a)).orElse(null);
+        AdDTO adDTO = ad.map(a -> adMapping.mapEntityToAdDto(a)).orElse(null);
         CreateOrUpdateCommentDTO commentDTO = comment.map(c -> mapToCreateOrUpdateCommentDTO(c)).orElse(null);
-        if (Objects.nonNull(adDto) && Objects.nonNull(commentDTO)) {
+
+        if (Objects.nonNull(adDTO) && Objects.nonNull(commentDTO)) {
             commentDTO.setText(createOrUpdateCommentDTO.getText());
             return commentRepository.save(mapToCommentFromCreateOrUpdateCommentDTO(commentDTO));
         }
         return null;
-
-//        if (!adRepository.existsById(adId)) {
-//            throw new NoSuchAdException();
-//        } else if (!commentRepository.existsById(commentId)) {
-//            throw new NoSuchCommentException();
-//        }
-//        Comment comment = commentRepository.getCommentById(commentId);
-//        comment.setText(textOfNewComment);
-//        commentRepository.save(comment);
-//        return comment;
     }
 
+    @Override
+    public Comment updateComment(String username, Integer adId, Integer commentId,
+                                 CreateOrUpdateCommentDTO createOrUpdateCommentDTO) {
+        if (ifExists(adId, commentId) && isAuthor(username, commentId)) {
+            updateComment(adId, commentId, createOrUpdateCommentDTO);
+        }
+        return null;
+    }
+
+    private boolean ifExists(Integer adId, Integer commentId) {
+        return adRepository.existsById(adId) && commentRepository.existsById(commentId);
+    }
+
+    private boolean isAuthor(String username, Integer commentId) {
+        return commentRepository.getCommentById(commentId).getAuthor().getId().equals(userRepository.getUserByUsername(username).getId());
+    }
 
     private Comment mapToCommentFromCommentDTO(CommentDTO commentDTO) {
         Comment comment = new Comment();

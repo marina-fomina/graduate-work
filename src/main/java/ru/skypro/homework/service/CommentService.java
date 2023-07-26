@@ -32,6 +32,9 @@ public interface CommentService {
      */
     boolean deleteComment(Integer adId, Integer commentId);
 
+    // Метод для CommentController
+    boolean deleteComment(String username, Integer adId, Integer commentId);
+
     /**
      * Update comment
      * @param adId primary key of ad
@@ -40,4 +43,7 @@ public interface CommentService {
      * @return
      */
     Comment updateComment(Integer adId, Integer commentId, CreateOrUpdateCommentDTO createOrUpdateCommentDTO);
+
+    Comment updateComment(String username, Integer adId, Integer commentId,
+                          CreateOrUpdateCommentDTO createOrUpdateCommentDTO);
 }

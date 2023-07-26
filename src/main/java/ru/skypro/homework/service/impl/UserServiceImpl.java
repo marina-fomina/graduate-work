@@ -108,7 +108,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setLastName(userDTO.getLastName());
         user.setPhone(userDTO.getPhone());
         user.setRole(role);
-        // TODO: переписать на userDTO
         if (userDTO.getImage() != null && !userDTO.getImage().isBlank()) {
             user.setImage(userDTO.getImage());
         }
@@ -127,10 +126,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setLastName(updateUserDTO.getLastName());
         user.setPhone(user.getPhone());
         user.setRole(role);
-        // TODO: зачем тут проверка?
-//        if (user.getImage() != null && !user.getImage().isBlank()) {
-//            user.setImage(imagePrefix + image.replace("\\", "/"));
-//        }
         user.setImage(image);
         return user;
     }
