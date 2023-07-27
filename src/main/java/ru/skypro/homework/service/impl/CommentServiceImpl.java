@@ -1,6 +1,7 @@
 package ru.skypro.homework.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.skypro.homework.dto.AdDTO;
 import ru.skypro.homework.dto.CommentDTO;
@@ -33,6 +34,7 @@ public class CommentServiceImpl implements CommentService {
     UserService userService;
     @Autowired
     AdMapping adMapping;
+    private final String imagePrefix = "/ads/image?id=";
 
     public CommentServiceImpl(CommentRepository commentRepository) {
         this.commentRepository = commentRepository;
@@ -153,7 +155,9 @@ public class CommentServiceImpl implements CommentService {
     private CommentDTO mapCommentToCommentDTO(Comment comment) {
         CommentDTO commentDTO = new CommentDTO();
         commentDTO.setAuthor(comment.getAuthor().getId());
-        commentDTO.setAuthorImage(comment.getAuthor().getImage());
+        if (comment.getAuthor().getImage() != null && !comment.getAuthor().getImage().isBlank()) {
+            commentDTO.setAuthorImage(imagePrefix + comment.getAuthor().getImage());
+        }
         commentDTO.setAuthorFirstName(comment.getAuthor().getFirstName());
         commentDTO.setCreatedAt(comment.getCreatedAt());
         commentDTO.setPk(comment.getId());
