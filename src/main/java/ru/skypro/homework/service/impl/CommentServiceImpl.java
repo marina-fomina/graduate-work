@@ -115,10 +115,9 @@ public class CommentServiceImpl implements CommentService {
         Optional<Comment> comment = commentRepository.findById(commentId);
         if(ad.isPresent() && comment.isPresent()) {
             if (isAuthor(user.getUsername(), commentId) || user.getRole().equals(Role.ADMIN)) {
-                CreateOrUpdateCommentDTO updateCommentDTO = mapToCreateOrUpdateCommentDTO(comment.get());
-                updateCommentDTO.setText(createOrUpdateCommentDTO.getText());
-                commentRepository.save(mapToCommentFromCreateOrUpdateCommentDTO(updateCommentDTO));
-                return mapCommentToCommentDTO(mapToCommentFromCreateOrUpdateCommentDTO(updateCommentDTO));
+                comment.get().setText(createOrUpdateCommentDTO.getText());
+                commentRepository.save(comment.get());
+                return mapCommentToCommentDTO(comment.get());
             }
         }
         return null;
