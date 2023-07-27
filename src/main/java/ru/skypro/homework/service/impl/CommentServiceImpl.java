@@ -2,12 +2,10 @@ package ru.skypro.homework.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.skypro.homework.dto.AdDTO;
-import ru.skypro.homework.dto.CommentDTO;
-import ru.skypro.homework.dto.CommentsDTO;
-import ru.skypro.homework.dto.CreateOrUpdateCommentDTO;
+import ru.skypro.homework.dto.*;
 import ru.skypro.homework.entity.Ad;
 import ru.skypro.homework.entity.Comment;
+import ru.skypro.homework.entity.User;
 import ru.skypro.homework.exception.NoSuchAdException;
 import ru.skypro.homework.repository.AdRepository;
 import ru.skypro.homework.repository.CommentRepository;
@@ -72,26 +70,33 @@ public class CommentServiceImpl implements CommentService {
 //    }
 
     // Метод для AdminController
-    @Override
-    public boolean deleteComment(Integer adId, Integer commentId) {
-        if (!adRepository.existsById(adId) || !commentRepository.existsById(commentId)) {
-            return false;
-        } else {
-            commentRepository.deleteById(commentId);
-            return true;
-        }
-    }
+//    @Override
+//    public boolean deleteComment(Integer adId, Integer commentId) {
+//        if (!adRepository.existsById(adId) || !commentRepository.existsById(commentId)) {
+//            return false;
+//        } else {
+//            commentRepository.deleteById(commentId);
+//            return true;
+//        }
+//    }
 
-    // Метод для CommentController
     @Override
     public boolean deleteComment(String username, Integer adId, Integer commentId) {
-        if (!ifExists(adId, commentId) && !isAuthor(username, commentId)) {
+        User user = userRepository.getUserByUsername(username);
+        if (!ifExists(adId, commentId)) {
             return false;
-        } else {
+        }
+        if (ifExists(adId, commentId) && user.getRole().equals(Role.ADMIN)) {
             commentRepository.deleteById(commentId);
             return true;
         }
+        if (ifExists(adId, commentId) && user.getRole().equals(Role.USER) && isAuthor(username, commentId)) {
+            commentRepository.deleteById(commentId);
+            return true;
+        }
+        return false;
     }
+
 
     //    @Override
 //    public Comment updateComment(Integer adId, Integer commentId, CreateOrUpdateCommentDTO createOrUpdateCommentDTO) {
@@ -106,27 +111,36 @@ public class CommentServiceImpl implements CommentService {
 //        return null;
 //    }
     @Override
-    public Comment updateComment(Integer adId, Integer commentId, CreateOrUpdateCommentDTO createOrUpdateCommentDTO) {
+    public CommentDTO updateComment(String username, Integer adId, Integer commentId,
+                                 CreateOrUpdateCommentDTO createOrUpdateCommentDTO) {
+        User user = userRepository.getUserByUsername(username);
         Optional<Ad> ad = adRepository.findById(adId);
         Optional<Comment> comment = commentRepository.findById(commentId);
         AdDTO adDTO = ad.map(a -> adMapping.mapEntityToAdDto(a)).orElse(null);
-        CreateOrUpdateCommentDTO commentDTO = comment.map(c -> mapToCreateOrUpdateCommentDTO(c)).orElse(null);
+        CreateOrUpdateCommentDTO updateCommentDTO = comment.map(c -> mapToCreateOrUpdateCommentDTO(c)).orElse(null);
 
-        if (Objects.nonNull(adDTO) && Objects.nonNull(commentDTO)) {
-            commentDTO.setText(createOrUpdateCommentDTO.getText());
-            return commentRepository.save(mapToCommentFromCreateOrUpdateCommentDTO(commentDTO));
+        if (Objects.nonNull(adDTO) && Objects.nonNull(updateCommentDTO) && user.getRole().equals(Role.ADMIN)) {
+            updateCommentDTO.setText(createOrUpdateCommentDTO.getText());
+            commentRepository.save(mapToCommentFromCreateOrUpdateCommentDTO(updateCommentDTO));
+            return mapCommentToCommentDTO(mapToCommentFromCreateOrUpdateCommentDTO(updateCommentDTO));
+        }
+        if (Objects.nonNull(adDTO) && Objects.nonNull(updateCommentDTO) &&
+            user.getRole().equals(Role.USER) && isAuthor(user.getUsername(), commentId)) {
+            updateCommentDTO.setText(createOrUpdateCommentDTO.getText());
+            commentRepository.save(mapToCommentFromCreateOrUpdateCommentDTO(updateCommentDTO));
+            return mapCommentToCommentDTO(mapToCommentFromCreateOrUpdateCommentDTO(updateCommentDTO));
         }
         return null;
     }
 
-    @Override
-    public Comment updateComment(String username, Integer adId, Integer commentId,
-                                 CreateOrUpdateCommentDTO createOrUpdateCommentDTO) {
-        if (ifExists(adId, commentId) && isAuthor(username, commentId)) {
-            updateComment(adId, commentId, createOrUpdateCommentDTO);
-        }
-        return null;
-    }
+//    @Override
+//    public Comment updateComment(String username, Integer adId, Integer commentId,
+//                                 CreateOrUpdateCommentDTO createOrUpdateCommentDTO) {
+//        if (ifExists(adId, commentId) && isAuthor(username, commentId)) {
+//            updateComment(adId, commentId, createOrUpdateCommentDTO);
+//        }
+//        return null;
+//    }
 
     private boolean ifExists(Integer adId, Integer commentId) {
         return adRepository.existsById(adId) && commentRepository.existsById(commentId);

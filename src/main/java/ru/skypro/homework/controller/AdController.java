@@ -3,6 +3,7 @@ package ru.skypro.homework.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.AdDTO;
@@ -58,14 +59,18 @@ public class AdController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteAd(@PathVariable Integer id) {
-        return adService.deleteAd(id) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+    public ResponseEntity<?> deleteAd(Authentication authentication,
+                                      @PathVariable Integer id) {
+        String username = authentication.getName();
+        return adService.deleteAd(username, id) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<AdDTO> patchAd(@PathVariable Integer id,
+    public ResponseEntity<AdDTO> patchAd(Authentication authentication,
+                                         @PathVariable Integer id,
                                          @RequestBody CreateOrUpdateAdDTO createOrUpdateAdDTO) {
-        AdDTO adDTO = adService.patchAd(id, createOrUpdateAdDTO);
+        String username = authentication.getName();
+        AdDTO adDTO = adService.patchAd(username, id, createOrUpdateAdDTO);
         return Objects.nonNull(adDTO) ? ResponseEntity.ok(adDTO) : ResponseEntity.notFound().build();
     }
 

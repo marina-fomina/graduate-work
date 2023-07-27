@@ -4,9 +4,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import ru.skypro.homework.dto.CommentDTO;
 import ru.skypro.homework.dto.CommentsDTO;
 import ru.skypro.homework.dto.CreateOrUpdateCommentDTO;
-import ru.skypro.homework.entity.Comment;
 import ru.skypro.homework.service.impl.CommentServiceImpl;
 
 import java.util.Objects;
@@ -57,10 +57,10 @@ public class CommentController {
 //            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 //        }
 //    }
-@DeleteMapping("/{adId}/comments/{commentId}")
-public ResponseEntity<Void> deleteComment(Authentication authentication,
-                                          @PathVariable Integer adId,
-                                          @PathVariable Integer commentId) {
+    @DeleteMapping("/{adId}/comments/{commentId}")
+    public ResponseEntity<Void> deleteComment(Authentication authentication,
+                                              @PathVariable Integer adId,
+                                              @PathVariable Integer commentId) {
     String username = authentication.getName();
     if (commentService.deleteComment(username, adId, commentId)) {
         return ResponseEntity.ok().build();
@@ -70,14 +70,14 @@ public ResponseEntity<Void> deleteComment(Authentication authentication,
 }
 
     @PatchMapping("/{adId}/comments/{commentId}")
-    public ResponseEntity<Comment> updateComment(Authentication authentication,
-                                                 @PathVariable Integer adId,
-                                                 @PathVariable Integer commentId,
-                                                 @RequestBody CreateOrUpdateCommentDTO createOrUpdateCommentDTO) {
+    public ResponseEntity<CommentDTO> updateComment(Authentication authentication,
+                                                    @PathVariable Integer adId,
+                                                    @PathVariable Integer commentId,
+                                                    @RequestBody CreateOrUpdateCommentDTO createOrUpdateCommentDTO) {
         String username = authentication.getName();
-        Comment comment = commentService.updateComment(username, adId, commentId, createOrUpdateCommentDTO);
-        if (Objects.nonNull(comment)) {
-            return ResponseEntity.ok(comment);
+        CommentDTO commentDTO = commentService.updateComment(username, adId, commentId, createOrUpdateCommentDTO);
+        if (Objects.nonNull(commentDTO)) {
+            return ResponseEntity.ok(commentDTO);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
