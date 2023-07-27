@@ -85,16 +85,11 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public boolean deleteComment(String username, Integer adId, Integer commentId) {
         User user = userRepository.getUserByUsername(username);
-        if (!ifExists(adId, commentId)) {
-            return false;
-        }
-        if (ifExists(adId, commentId) && user.getRole().equals(Role.ADMIN)) {
-            commentRepository.deleteById(commentId);
-            return true;
-        }
-        if (ifExists(adId, commentId) && user.getRole().equals(Role.USER) && isAuthor(username, commentId)) {
-            commentRepository.deleteById(commentId);
-            return true;
+        if (ifExists(adId, commentId) && Objects.nonNull(user)) {
+            if (isAuthor(username, commentId) || user.getRole().equals(Role.ADMIN)) {
+                commentRepository.deleteById(commentId);
+                return true;
+            }
         }
         return false;
     }
@@ -118,19 +113,13 @@ public class CommentServiceImpl implements CommentService {
         User user = userRepository.getUserByUsername(username);
         Optional<Ad> ad = adRepository.findById(adId);
         Optional<Comment> comment = commentRepository.findById(commentId);
-        AdDTO adDTO = ad.map(a -> adMapping.mapEntityToAdDto(a)).orElse(null);
-        CreateOrUpdateCommentDTO updateCommentDTO = comment.map(c -> mapToCreateOrUpdateCommentDTO(c)).orElse(null);
-
-        if (Objects.nonNull(adDTO) && Objects.nonNull(updateCommentDTO) && user.getRole().equals(Role.ADMIN)) {
-            updateCommentDTO.setText(createOrUpdateCommentDTO.getText());
-            commentRepository.save(mapToCommentFromCreateOrUpdateCommentDTO(updateCommentDTO));
-            return mapCommentToCommentDTO(mapToCommentFromCreateOrUpdateCommentDTO(updateCommentDTO));
-        }
-        if (Objects.nonNull(adDTO) && Objects.nonNull(updateCommentDTO) &&
-            user.getRole().equals(Role.USER) && isAuthor(user.getUsername(), commentId)) {
-            updateCommentDTO.setText(createOrUpdateCommentDTO.getText());
-            commentRepository.save(mapToCommentFromCreateOrUpdateCommentDTO(updateCommentDTO));
-            return mapCommentToCommentDTO(mapToCommentFromCreateOrUpdateCommentDTO(updateCommentDTO));
+        if(ad.isPresent() && comment.isPresent()) {
+            if (isAuthor(user.getUsername(), commentId) || user.getRole().equals(Role.ADMIN)) {
+                CreateOrUpdateCommentDTO updateCommentDTO = mapToCreateOrUpdateCommentDTO(comment.get());
+                updateCommentDTO.setText(createOrUpdateCommentDTO.getText());
+                commentRepository.save(mapToCommentFromCreateOrUpdateCommentDTO(updateCommentDTO));
+                return mapCommentToCommentDTO(mapToCommentFromCreateOrUpdateCommentDTO(updateCommentDTO));
+            }
         }
         return null;
     }

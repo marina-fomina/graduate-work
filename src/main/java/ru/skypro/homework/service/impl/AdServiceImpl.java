@@ -41,6 +41,7 @@ public class AdServiceImpl implements AdService {
         List<Ad> entityList = adRepository.findAllByAuthor(userService.getUser().orElseThrow());
         return adMapping.mapEntityListToAdsDto(entityList);
     }
+
     @Override
     public AdsDTO getAds() {
         List<Ad> entityList = adRepository.findAll();
@@ -62,15 +63,11 @@ public class AdServiceImpl implements AdService {
     @Override
     public boolean deleteAd(String username, Integer id) {
         User user = userRepository.getUserByUsername(username);
-        if (!adRepository.existsById(id)) {
-            return false;
-        }
-        if (adRepository.existsById(id) && user.getRole().equals(Role.USER) && isAuthor(username, id)) {
-            adRepository.deleteById(id);
-            return true;
-        } else if (adRepository.existsById(id) && user.getRole().equals(Role.ADMIN)) {
-            adRepository.deleteById(id);
-            return true;
+        if (adRepository.existsById(id) && Objects.nonNull(user)) {
+            if (isAuthor(username, id) || user.getRole().equals(Role.ADMIN)) {
+                adRepository.deleteById(id);
+                return true;
+            }
         }
         return false;
     }
@@ -80,25 +77,21 @@ public class AdServiceImpl implements AdService {
         User user = userRepository.getUserByUsername(username);
         Optional<Ad> ad = adRepository.findById(id);
         ExtendedAdDTO adDto = ad.map(a -> adMapping.mapEntityToExtendedAdDto(a)).orElse(null);
-
-        if (Objects.nonNull(adDto) && user.getRole().equals(Role.ADMIN)) {
-            adDto.setTitle(createOrUpdateAdDTO.getTitle());
-            adDto.setPrice(createOrUpdateAdDTO.getPrice());
-            adDto.setDescription(createOrUpdateAdDTO.getDescription());
-            return adMapping.mapEntityToAdDto(adRepository.save(adMapping.mapExtendedAdToAdEntity(adDto)));
-        }
-        if (Objects.nonNull(adDto) && user.getRole().equals(Role.USER) && isAuthor(username, id)) {
-            adDto.setTitle(createOrUpdateAdDTO.getTitle());
-            adDto.setPrice(createOrUpdateAdDTO.getPrice());
-            adDto.setDescription(createOrUpdateAdDTO.getDescription());
-            return adMapping.mapEntityToAdDto(adRepository.save(adMapping.mapExtendedAdToAdEntity(adDto)));
+        if (Objects.nonNull(adDto) && Objects.nonNull(user)) {
+            if (user.getRole().equals(Role.ADMIN) || isAuthor(username, id)) {
+                adDto.setTitle(createOrUpdateAdDTO.getTitle());
+                adDto.setPrice(createOrUpdateAdDTO.getPrice());
+                adDto.setDescription(createOrUpdateAdDTO.getDescription());
+                return adMapping.mapEntityToAdDto(adRepository.save(adMapping.mapExtendedAdToAdEntity(adDto)));
+            }
         }
         return null;
     }
 
     /**
      * Update ad image
-     * @param id primary key of ad
+     *
+     * @param id   primary key of ad
      * @param file new image
      * @return UUID
      */
