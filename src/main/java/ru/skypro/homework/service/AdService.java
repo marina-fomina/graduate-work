@@ -5,24 +5,58 @@ import ru.skypro.homework.dto.AdDTO;
 import ru.skypro.homework.dto.AdsDTO;
 import ru.skypro.homework.dto.CreateOrUpdateAdDTO;
 import ru.skypro.homework.dto.ExtendedAdDTO;
-import ru.skypro.homework.model.Image;
-
-import java.io.FileNotFoundException;
 
 public interface AdService {
+    /**
+     * Get all ads for current user
+     *
+     * @return the number of ads and their list
+     */
+    AdsDTO getUserAds();
+
+    /**
+     * Get all ads
+     *
+     * @return the number of ads and their list
+     */
     AdsDTO getAds();
 
+    /**
+     * Add Ad
+     *
+     * @param extendedAdDTO includes information about ad and author
+     * @return information about ad (primary key, author (id), image, price, title)
+     */
     AdDTO addAd(ExtendedAdDTO extendedAdDTO);
 
-    AdDTO patchAd(Integer id, CreateOrUpdateAdDTO createOrUpdateAdDTO);
+    /**
+     * Deleting an ad by primary key
+     *
+     * @param username username of ad author
+     * @param id primary key
+     * @return true (if ad was found and deleted) or false (if not)
+     */
+    boolean deleteAd(String username, Integer id);
 
-    String saveImage(MultipartFile file);
 
+    /**
+     * Get ad by primary key
+     *
+     * @param id primary key
+     * @return information about ad and author
+     */
     ExtendedAdDTO getAdById(Integer id);
 
-    boolean deleteAd(Integer id);
+    /**
+     * Changing the information in the ad
+     *
+     * @param username username of ad author
+     * @param id primary key
+     * @param createOrUpdateAdDTO includes information about name, price and description of the ad
+     * @return information about ad (primary key, author (id), image, price, title)
+     */
 
-    String saveImage(Integer id, MultipartFile file);
+    AdDTO patchAd(String username, Integer id, CreateOrUpdateAdDTO createOrUpdateAdDTO);
 
-    Image getImage(String path) throws FileNotFoundException;
+    String updateAdImage(Integer id, MultipartFile file);
 }

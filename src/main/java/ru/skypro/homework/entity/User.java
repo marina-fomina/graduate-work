@@ -39,6 +39,7 @@ public class User {
     private String phone;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private Role role;
 
     @Column
@@ -46,6 +47,8 @@ public class User {
 
     @OneToMany(mappedBy="author")
     private List<Comment> comments = new ArrayList<>();
+    @OneToMany(mappedBy = "author")
+    private List<Ad> ads = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {

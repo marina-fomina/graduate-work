@@ -13,6 +13,7 @@ import ru.skypro.homework.dto.UserDTO;
 import ru.skypro.homework.entity.User;
 import ru.skypro.homework.model.Image;
 import ru.skypro.homework.service.AuthService;
+import ru.skypro.homework.service.ImageService;
 import ru.skypro.homework.service.UserService;
 
 import java.io.FileNotFoundException;
@@ -24,11 +25,13 @@ import java.nio.file.FileAlreadyExistsException;
 public class UserController {
 
     private final UserService userService;
+    private final ImageService imageService;
     private final AuthService authService;
 
-    public UserController(UserService userService, AuthService authService) {
+    public UserController(UserService userService, AuthService authService, ImageService imageService) {
         this.userService = userService;
         this.authService = authService;
+        this.imageService = imageService;
     }
 
     @PostMapping("/set_password")
@@ -44,10 +47,9 @@ public class UserController {
 
 
     @GetMapping("/me")
-    public ResponseEntity<UserDTO> getUser(Authentication authentication,
-                                           @RequestParam Integer id) {
-
-        return ResponseEntity.ok(userService.getUser(id));
+    public ResponseEntity<UserDTO> getUser(Authentication authentication) {
+        UserDTO userDTO = userService.getUser(authentication.getName());
+        return ResponseEntity.ok().body(userDTO);
     }
 
 
@@ -61,26 +63,24 @@ public class UserController {
     @PatchMapping(value = "/me/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> updateUserImage(Authentication authentication,
                                                   @RequestParam MultipartFile image) {
-
-        String username = authentication.getName();
-        userService.updateUserImage(image, username);
+        userService.updateUserImage(image, authentication.getName());
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/image")
-    public ResponseEntity<byte[]> getImage(String path) {
-        String filePath = path.substring(1);
-        try {
-            Image image = userService.getImage(filePath);
-            return ResponseEntity.ok().contentType(image.getMediaType()).body(image.getBytes());
-        } catch (FileAlreadyExistsException e) { // не FileNotFoundException
-            throw new RuntimeException(e);
-        }
+    public ResponseEntity<byte[]> getImage(String id) {
+        Image image = imageService.getImage(id);
+        return ResponseEntity.ok().contentType(image.getMediaType()).body(image.getBytes());
+//        try {
+//        } catch (FileAlreadyExistsException e) { // не FileNotFoundException
+//            throw new RuntimeException(e);
+//        }
     }
 
     @PostMapping("/save")
     public ResponseEntity<User> saveUser(@RequestBody RegisterReq req,
                                          @RequestParam MultipartFile image) {
+        // TODO: не используемый image
         return ResponseEntity.ok(userService.mapToUserAndSave(req));
     }
 }

@@ -16,9 +16,9 @@ public class Ad {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    // TODO: переписать под пользователя
-    @Column(name = "author_id", nullable = false)
-    private Integer author;
+    @ManyToOne
+    @JoinColumn(name = "author_id", nullable = false)
+    private User author;
     String image;
     Integer price;
     @Column(nullable = false, length = 100)
@@ -26,7 +26,7 @@ public class Ad {
     @Column(length = 1024)
     String description;
 
-    @OneToMany(mappedBy="ad")
+    @OneToMany(mappedBy="ad", fetch = FetchType.EAGER)
     @ToString.Exclude
     private List<Comment> comments = new ArrayList<>();
 }

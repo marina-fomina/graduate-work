@@ -22,11 +22,14 @@ public class Comment {
     @JoinColumn(name = "author_id", nullable = false)
     private User author;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ad_id", nullable = false)
     private Ad ad;
 
     @Column(nullable = false)
     private String text;
+
+    @Column(name = "created_at")
+    private Long createdAt;
 
 }
