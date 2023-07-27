@@ -5,12 +5,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import ru.skypro.homework.dto.AdDTO;
-import ru.skypro.homework.dto.AdsDTO;
-import ru.skypro.homework.dto.CreateOrUpdateAdDTO;
-import ru.skypro.homework.dto.ExtendedAdDTO;
+import ru.skypro.homework.dto.*;
 import ru.skypro.homework.entity.Ad;
+import ru.skypro.homework.entity.User;
 import ru.skypro.homework.repository.AdRepository;
+import ru.skypro.homework.repository.UserRepository;
 import ru.skypro.homework.service.AdService;
 import ru.skypro.homework.service.ImageService;
 import ru.skypro.homework.service.UserService;
@@ -26,6 +25,9 @@ import java.util.Optional;
 public class AdServiceImpl implements AdService {
     @Autowired
     AdRepository adRepository;
+
+    @Autowired
+    UserRepository userRepository;
     @Autowired
     AdMapping adMapping;
     @Autowired
@@ -58,18 +60,34 @@ public class AdServiceImpl implements AdService {
     }
 
     @Override
-    public boolean deleteAd(Integer id) {
-        boolean flag = adRepository.existsById(id);
-        if (flag) {
-            adRepository.deleteById(id);
+    public boolean deleteAd(String username, Integer id) {
+        User user = userRepository.getUserByUsername(username);
+        if (!adRepository.existsById(id)) {
+            return false;
         }
-        return flag;
+        if (adRepository.existsById(id) && user.getRole().equals(Role.USER) && isAuthor(username, id)) {
+            adRepository.deleteById(id);
+            return true;
+        } else if (adRepository.existsById(id) && user.getRole().equals(Role.ADMIN)) {
+            adRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
+
     @Override
-    public AdDTO patchAd(Integer id, CreateOrUpdateAdDTO createOrUpdateAdDTO) {
+    public AdDTO patchAd(String username, Integer id, CreateOrUpdateAdDTO createOrUpdateAdDTO) {
+        User user = userRepository.getUserByUsername(username);
         Optional<Ad> ad = adRepository.findById(id);
         ExtendedAdDTO adDto = ad.map(a -> adMapping.mapEntityToExtendedAdDto(a)).orElse(null);
-        if (Objects.nonNull(adDto)) {
+
+        if (Objects.nonNull(adDto) && user.getRole().equals(Role.ADMIN)) {
+            adDto.setTitle(createOrUpdateAdDTO.getTitle());
+            adDto.setPrice(createOrUpdateAdDTO.getPrice());
+            adDto.setDescription(createOrUpdateAdDTO.getDescription());
+            return adMapping.mapEntityToAdDto(adRepository.save(adMapping.mapExtendedAdToAdEntity(adDto)));
+        }
+        if (Objects.nonNull(adDto) && user.getRole().equals(Role.USER) && isAuthor(username, id)) {
             adDto.setTitle(createOrUpdateAdDTO.getTitle());
             adDto.setPrice(createOrUpdateAdDTO.getPrice());
             adDto.setDescription(createOrUpdateAdDTO.getDescription());
@@ -97,5 +115,9 @@ public class AdServiceImpl implements AdService {
             logger.info("Not found Ad with id: {}", id);
             return null;
         }
+    }
+
+    private boolean isAuthor(String username, Integer id) {
+        return adRepository.getAdById(id).getAuthor().getId().equals(userRepository.getUserByUsername(username).getId());
     }
 }
