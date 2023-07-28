@@ -33,7 +33,7 @@ public interface AdService {
      * Deleting an ad by primary key
      *
      * @param username username of ad author
-     * @param id primary key
+     * @param id       primary key
      * @return true (if ad was found and deleted) or false (if not)
      */
     boolean deleteAd(String username, Integer id);
@@ -50,13 +50,19 @@ public interface AdService {
     /**
      * Changing the information in the ad
      *
-     * @param username username of ad author
-     * @param id primary key
+     * @param username            username of ad author
+     * @param id                  primary key
      * @param createOrUpdateAdDTO includes information about name, price and description of the ad
      * @return information about ad (primary key, author (id), image, price, title)
      */
-
     AdDTO patchAd(String username, Integer id, CreateOrUpdateAdDTO createOrUpdateAdDTO);
 
+    /**
+     * Update ad image
+     *
+     * @param id   primary key of ad
+     * @param file new image
+     * @return UUID
+     */
     String updateAdImage(Integer id, MultipartFile file);
 }

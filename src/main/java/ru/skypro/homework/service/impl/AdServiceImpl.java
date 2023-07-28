@@ -25,7 +25,6 @@ import java.util.Optional;
 public class AdServiceImpl implements AdService {
     @Autowired
     AdRepository adRepository;
-
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -88,13 +87,6 @@ public class AdServiceImpl implements AdService {
         return null;
     }
 
-    /**
-     * Update ad image
-     *
-     * @param id   primary key of ad
-     * @param file new image
-     * @return UUID
-     */
     @Override
     public String updateAdImage(Integer id, MultipartFile file) {
         Optional<Ad> entity = adRepository.findById(id);

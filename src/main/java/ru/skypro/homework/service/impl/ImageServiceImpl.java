@@ -27,10 +27,6 @@ import java.util.UUID;
 public class ImageServiceImpl implements ImageService {
     @Value("${path.to.data.file.images}")
     String pathToFileRepository;
-    @Autowired
-    AdRepository adRepository;
-    @Autowired
-    UserRepository userRepository;
     Logger logger = LoggerFactory.getLogger(ImageService.class);
     @Override
     public String saveImage(MultipartFile file) {

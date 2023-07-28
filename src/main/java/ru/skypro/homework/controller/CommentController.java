@@ -37,37 +37,17 @@ public class CommentController {
         return Objects.nonNull(createOrUpdateCommentDTO) ? ResponseEntity.ok(createOrUpdateCommentDTO) : ResponseEntity.notFound().build();
     }
 
-//    @DeleteMapping("/{adId}/comments/{commentId}")
-//    public ResponseEntity<Void> deleteComment(@PathVariable Integer adId, @PathVariable Integer commentId) {
-//        if (commentService.deleteComment(adId, commentId)) {
-//            return ResponseEntity.ok().build();
-//        } else {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-//        }
-//    }
-//    // TODO: почему возвращаем comment?
-//    @PatchMapping("/{adId}/comments/{commentId}")
-//    public ResponseEntity<Comment> updateComment(@PathVariable Integer adId,
-//                                                 @PathVariable Integer commentId,
-//                                                 @RequestBody CreateOrUpdateCommentDTO createOrUpdateCommentDTO) {
-//        Comment comment = commentService.updateComment(adId, commentId, createOrUpdateCommentDTO);
-//        if (Objects.nonNull(comment)) {
-//            return ResponseEntity.ok(comment);
-//        } else {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-//        }
-//    }
     @DeleteMapping("/{adId}/comments/{commentId}")
     public ResponseEntity<Void> deleteComment(Authentication authentication,
                                               @PathVariable Integer adId,
                                               @PathVariable Integer commentId) {
-    String username = authentication.getName();
-    if (commentService.deleteComment(username, adId, commentId)) {
-        return ResponseEntity.ok().build();
-    } else {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        String username = authentication.getName();
+        if (commentService.deleteComment(username, adId, commentId)) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
-}
 
     @PatchMapping("/{adId}/comments/{commentId}")
     public ResponseEntity<CommentDTO> updateComment(Authentication authentication,

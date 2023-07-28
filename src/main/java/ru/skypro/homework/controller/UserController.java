@@ -16,9 +16,6 @@ import ru.skypro.homework.service.AuthService;
 import ru.skypro.homework.service.ImageService;
 import ru.skypro.homework.service.UserService;
 
-import java.io.FileNotFoundException;
-import java.nio.file.FileAlreadyExistsException;
-
 @CrossOrigin(value = "http://localhost:3000")
 @RestController
 @RequestMapping("/users")
@@ -26,11 +23,9 @@ public class UserController {
 
     private final UserService userService;
     private final ImageService imageService;
-    private final AuthService authService;
 
-    public UserController(UserService userService, AuthService authService, ImageService imageService) {
+    public UserController(UserService userService, ImageService imageService) {
         this.userService = userService;
-        this.authService = authService;
         this.imageService = imageService;
     }
 
@@ -71,16 +66,5 @@ public class UserController {
     public ResponseEntity<byte[]> getImage(String id) {
         Image image = imageService.getImage(id);
         return ResponseEntity.ok().contentType(image.getMediaType()).body(image.getBytes());
-//        try {
-//        } catch (FileAlreadyExistsException e) { // не FileNotFoundException
-//            throw new RuntimeException(e);
-//        }
-    }
-
-    @PostMapping("/save")
-    public ResponseEntity<User> saveUser(@RequestBody RegisterReq req,
-                                         @RequestParam MultipartFile image) {
-        // TODO: не используемый image
-        return ResponseEntity.ok(userService.mapToUserAndSave(req));
     }
 }

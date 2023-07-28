@@ -40,7 +40,6 @@ public class AdController {
     public ResponseEntity<AdDTO> addAd(@RequestPart(name = "properties") CreateOrUpdateAdDTO createOrUpdateAdDTO,
                                        @RequestPart MultipartFile image) {
         // Сохранение image в репозиторий пользователя
-//        String imageLink = adService.saveImage(image);
         String imageLink = imageService.saveImage(image);
         ExtendedAdDTO extendedAdDTO = adMapping.mapCreateOrUpdateAdToExtendedAd(createOrUpdateAdDTO, imageLink);
         return new ResponseEntity<>(adService.addAd(extendedAdDTO), HttpStatus.CREATED);
@@ -83,7 +82,6 @@ public class AdController {
     @PatchMapping("/{id}/image")
     public ResponseEntity<String> updateImage(@PathVariable Integer id,
                                               @RequestParam MultipartFile image) {
-//        String imageLink = adService.saveImage(id, image);
         String imageLink = adService.updateAdImage(id, image);
         return imageLink == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(imageLink);
     }
