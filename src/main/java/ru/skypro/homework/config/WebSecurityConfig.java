@@ -1,4 +1,4 @@
-package ru.skypro.homework;
+package ru.skypro.homework.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,6 +27,9 @@ public class WebSecurityConfig {
             "/image/"
     };
 
+    /**
+     * Chain of filters for processing incoming requests according to security settings
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf()
@@ -40,7 +43,6 @@ public class WebSecurityConfig {
                                         .permitAll()
                                         .mvcMatchers("/ads/**", "/users/**")
                                         .authenticated()
-//                                        .mvcMatchers("/admin/**").hasRole(Role.ADMIN.name()) // Права для админа.
                 )
                 .cors()
                 .and()
@@ -48,6 +50,9 @@ public class WebSecurityConfig {
         return http.build();
     }
 
+    /**
+     * Bean for hashing users passwords
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

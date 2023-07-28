@@ -11,14 +11,26 @@ import java.util.stream.Collectors;
 
 @Service
 public class CommentMapping {
-    private final String imagePrefix = "/ads/image?id=";
+    private static final String imagePrefix = "/ads/image?id=";
 
+    /**
+     * Mapping from CreateOrUpdateCommentDTO to Comment
+     *
+     * @param createOrUpdateCommentDTO instance of {@link CreateOrUpdateCommentDTO} class
+     * @return instance of {@link Comment} class
+     */
     public Comment mapToCommentFromCreateOrUpdateCommentDTO(CreateOrUpdateCommentDTO createOrUpdateCommentDTO) {
         Comment comment = new Comment();
         comment.setText(createOrUpdateCommentDTO.getText());
         return comment;
     }
 
+    /**
+     * Mapping from Comment to CommentDTO
+     *
+     * @param comment instance of {@link Comment} class
+     * @return instance of {@link CommentDTO} class
+     */
     public CommentDTO mapCommentToCommentDTO(Comment comment) {
         CommentDTO commentDTO = new CommentDTO();
         commentDTO.setAuthor(comment.getAuthor().getId());
@@ -32,6 +44,12 @@ public class CommentMapping {
         return commentDTO;
     }
 
+    /**
+     * Mapping from list of comments to CommentsDTO
+     *
+     * @param comments list of ad comments
+     * @return instance of {@link CommentsDTO} class with numbers of comments and list of them (ArrayList)
+     */
     public CommentsDTO mapToCommentsDTO(List<Comment> comments) {
         CommentsDTO commentsDTO = new CommentsDTO();
         commentsDTO.setResults(comments.stream().map(this::mapCommentToCommentDTO).collect(Collectors.toList()));

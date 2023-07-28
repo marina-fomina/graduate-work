@@ -5,20 +5,21 @@ import ru.skypro.homework.dto.CommentsDTO;
 import ru.skypro.homework.dto.CreateOrUpdateCommentDTO;
 
 public interface CommentService {
+
     /**
-     * Get all comments on the ad
+     * Get all comments of the ad
      *
-     * @param id primary key of ad
-     * @return the number of comments and their list
+     * @param id ad primary key
+     * @return instance of {@link CommentsDTO} class that includes the number of comments and their list
      */
     CommentsDTO getComments(Integer id);
 
     /**
      * Add comment
      *
-     * @param id         primary key of ad
+     * @param id ad primary key
      * @param commentDTO contains information about the author of the comment and its text
-     * @return text comment
+     * @return text of comment
      */
     CreateOrUpdateCommentDTO addComment(Integer id, CreateOrUpdateCommentDTO commentDTO);
 
@@ -26,22 +27,22 @@ public interface CommentService {
      * Delete comment
      *
      * @param username username of comment author
-     * @param adId primary key of ad
-     * @param commentId primary key of comment
-     * @return true or false
+     * @param adId ad primary key
+     * @param commentId comment primary key
+     * @return true (if comment was found and deleted) or false (if not)
      */
 
-    // Метод для CommentController
     boolean deleteComment(String username, Integer adId, Integer commentId);
 
     /**
      * Update comment
      *
      * @param username username of comment author
-     * @param adId primary key of ad
-     * @param commentId primary key of comment
-     * @param createOrUpdateCommentDTO comment text
-     * @return
+     * @param adId ad primary key
+     * @param commentId comment primary key
+     * @param createOrUpdateCommentDTO new text of comment
+     * @return instance of {@link CommentDTO} class that includes author id, author image link, author first name,
+     * time of comment creation, comment id and its text
      */
 
     CommentDTO updateComment(String username, Integer adId, Integer commentId,

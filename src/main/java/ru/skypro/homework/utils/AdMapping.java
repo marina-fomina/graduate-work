@@ -18,6 +18,12 @@ public class AdMapping {
     UserService userService;
     private final String imagePrefix = "/ads/image?id=";
 
+    /**
+     * Mapping from Ad to AdDto
+     *
+     * @param ad instance of {@link Ad} class
+     * @return instance of {@link AdDTO} class
+     */
     public AdDTO mapEntityToAdDto(Ad ad) {
         AdDTO adDto = new AdDTO();
         adDto.setPk(ad.getId());
@@ -30,6 +36,12 @@ public class AdMapping {
         return adDto;
     }
 
+    /**
+     * Mapping from collection of ads to AdsDto
+     *
+     * @param ad collection of ads
+     * @return instance of {@link AdsDTO} class
+     */
     public AdsDTO mapEntityListToAdsDto(Collection<Ad> ad) {
         AdsDTO adsDto = new AdsDTO();
         adsDto.setCount(ad.size());
@@ -37,6 +49,12 @@ public class AdMapping {
         return adsDto;
     }
 
+    /**
+     * Mapping from Ad to ExtendedAdDTO
+     *
+     * @param ad instance of {@link Ad} class
+     * @return instance of {@link ExtendedAdDTO} class
+     */
     public ExtendedAdDTO mapEntityToExtendedAdDto(Ad ad) {
         ExtendedAdDTO extendedAdDto = new ExtendedAdDTO();
         extendedAdDto.setPk(ad.getId());
@@ -53,6 +71,13 @@ public class AdMapping {
         return extendedAdDto;
     }
 
+    /**
+     * Mapping from CreateOrUpdateAdDTO to ExtendedAdDTO
+     *
+     * @param createOrUpdateAdDTO instance of {@link CreateOrUpdateAdDTO} class
+     * @param imageLink link to ad image
+     * @return instance of {@link ExtendedAdDTO} class
+     */
     public ExtendedAdDTO mapCreateOrUpdateAdToExtendedAd(CreateOrUpdateAdDTO createOrUpdateAdDTO, String imageLink) {
         ExtendedAdDTO extendedAdDTO = new ExtendedAdDTO();
         extendedAdDTO.setTitle(createOrUpdateAdDTO.getTitle());
@@ -62,6 +87,12 @@ public class AdMapping {
         return extendedAdDTO;
     }
 
+    /**
+     * Mapping from ExtendedAdDTO to Ad
+     *
+     * @param extendedAdDTO instance of {@link ExtendedAdDTO} class
+     * @return instance of {@link Ad} class
+     */
     public Ad mapExtendedAdToAdEntity(ExtendedAdDTO extendedAdDTO) {
         Ad ad = new Ad();
         if (extendedAdDTO.getPk() != null) {

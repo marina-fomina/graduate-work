@@ -9,6 +9,5 @@ import java.util.List;
 @Repository
 public interface AdRepository extends JpaRepository<Ad, Integer> {
     List<Ad> findAllByAuthor(User user);
-
     Ad getAdById(Integer id);
 }

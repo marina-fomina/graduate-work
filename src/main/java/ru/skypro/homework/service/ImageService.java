@@ -6,10 +6,11 @@ import ru.skypro.homework.model.Image;
 import java.nio.file.Path;
 
 public interface ImageService {
+
     /**
      * Save image to file server
      *
-     * @param file file for save
+     * @param file file for saving
      * @return file name (GUID)
      */
     String saveImage(MultipartFile file);
@@ -18,7 +19,7 @@ public interface ImageService {
      * Get image by GUID
      *
      * @param id GUID
-     * @return {@link Image}
+     * @return instance of {@link Image} class
      */
     Image getImage(String id);
 
@@ -33,7 +34,7 @@ public interface ImageService {
      * Get full path of image in file server by GUID
      *
      * @param id GUID
-     * @return path of image
+     * @return path of image (instance of {@link Path})
      */
     Path pathOfImage(String id);
 }
