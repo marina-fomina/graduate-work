@@ -26,7 +26,7 @@ public class Ad {
     @Column(length = 1024)
     String description;
 
-    @OneToMany(mappedBy="ad", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy="ad", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     @ToString.Exclude
     private List<Comment> comments = new ArrayList<>();
 }
