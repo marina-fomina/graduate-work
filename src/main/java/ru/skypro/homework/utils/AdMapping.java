@@ -1,78 +1,109 @@
 package ru.skypro.homework.utils;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.skypro.homework.dto.AdDTO;
 import ru.skypro.homework.dto.AdsDTO;
 import ru.skypro.homework.dto.CreateOrUpdateAdDTO;
 import ru.skypro.homework.dto.ExtendedAdDTO;
-import ru.skypro.homework.entity.AdEntity;
+import ru.skypro.homework.entity.Ad;
+import ru.skypro.homework.service.UserService;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
 
 @Service
 public class AdMapping {
-    public AdDTO mapEntityToAdDto(AdEntity ad) {
+    @Autowired
+    UserService userService;
+    private final String imagePrefix = "/ads/image?id=";
+
+    /**
+     * Mapping from Ad to AdDto
+     *
+     * @param ad instance of {@link Ad} class
+     * @return instance of {@link AdDTO} class
+     */
+    public AdDTO mapEntityToAdDto(Ad ad) {
         AdDTO adDto = new AdDTO();
         adDto.setPk(ad.getId());
-        adDto.setAuthor(ad.getAuthor());
-        adDto.setImage(ad.getImage());
+        adDto.setAuthor(ad.getAuthor().getId());
+        if (ad.getImage() != null && !ad.getImage().isBlank()) {
+            adDto.setImage(imagePrefix + ad.getImage());
+        }
         adDto.setTitle(ad.getTitle());
         adDto.setPrice(ad.getPrice());
         return adDto;
     }
 
-    public AdsDTO mapEntityListToAdsDto(Collection<AdEntity> ad) {
+    /**
+     * Mapping from collection of ads to AdsDto
+     *
+     * @param ad collection of ads
+     * @return instance of {@link AdsDTO} class
+     */
+    public AdsDTO mapEntityListToAdsDto(Collection<Ad> ad) {
         AdsDTO adsDto = new AdsDTO();
         adsDto.setCount(ad.size());
         adsDto.setResults(ad.stream().map(this::mapEntityToAdDto).collect(Collectors.toList()));
         return adsDto;
     }
 
-    public ExtendedAdDTO mapEntityToExtendedAdDto(AdEntity ad) {
+    /**
+     * Mapping from Ad to ExtendedAdDTO
+     *
+     * @param ad instance of {@link Ad} class
+     * @return instance of {@link ExtendedAdDTO} class
+     */
+    public ExtendedAdDTO mapEntityToExtendedAdDto(Ad ad) {
         ExtendedAdDTO extendedAdDto = new ExtendedAdDTO();
         extendedAdDto.setPk(ad.getId());
         extendedAdDto.setDescription(ad.getDescription());
-        extendedAdDto.setImage(ad.getImage());
+        if (ad.getImage() != null && !ad.getImage().isBlank()) {
+            extendedAdDto.setImage(imagePrefix + ad.getImage());
+        }
         extendedAdDto.setTitle(ad.getTitle());
         extendedAdDto.setPrice(ad.getPrice());
-
-        // TODO: получить данные пользователя
-        // Optional<User> user = userRepository.findById(adEntity.get().getAuthor());
-//        if (user.isPresent()) {
-        extendedAdDto.setAuthorFirstName(null);
-        extendedAdDto.setAuthorLastName(null);
-        extendedAdDto.setPhone(null);
-        extendedAdDto.setEmail(null);
-//        }
+        extendedAdDto.setAuthorFirstName(ad.getAuthor().getFirstName());
+        extendedAdDto.setAuthorLastName(ad.getAuthor().getLastName());
+        extendedAdDto.setPhone(ad.getAuthor().getPhone());
+        extendedAdDto.setEmail(ad.getAuthor().getUsername());
         return extendedAdDto;
     }
 
-    public CreateOrUpdateAdDTO mapEntityToCreateOrUpdateAd(AdEntity ad) {
-        CreateOrUpdateAdDTO createOrUpdateAdDTO = new CreateOrUpdateAdDTO();
-        createOrUpdateAdDTO.setTitle(ad.getTitle());
-        createOrUpdateAdDTO.setPrice(ad.getPrice());
-        createOrUpdateAdDTO.setDescription(ad.getDescription());
-        return createOrUpdateAdDTO;
+    /**
+     * Mapping from CreateOrUpdateAdDTO to ExtendedAdDTO
+     *
+     * @param createOrUpdateAdDTO instance of {@link CreateOrUpdateAdDTO} class
+     * @param imageLink link to ad image
+     * @return instance of {@link ExtendedAdDTO} class
+     */
+    public ExtendedAdDTO mapCreateOrUpdateAdToExtendedAd(CreateOrUpdateAdDTO createOrUpdateAdDTO, String imageLink) {
+        ExtendedAdDTO extendedAdDTO = new ExtendedAdDTO();
+        extendedAdDTO.setTitle(createOrUpdateAdDTO.getTitle());
+        extendedAdDTO.setPrice(createOrUpdateAdDTO.getPrice());
+        extendedAdDTO.setDescription(createOrUpdateAdDTO.getDescription());
+        extendedAdDTO.setImage(imageLink);
+        return extendedAdDTO;
     }
 
-    public AdEntity mapCreateOrUpdateAdToEntity(CreateOrUpdateAdDTO ad) {
-        AdEntity adEntity = new AdEntity();
-        adEntity.setTitle(ad.getTitle());
-        adEntity.setPrice(ad.getPrice());
-        adEntity.setDescription(ad.getDescription());
-        return adEntity;
-    }
-
-    public AdEntity mapDtoToAdEntity(AdDTO adDTO) {
-        AdEntity adEntity = new AdEntity();
-        // TODO: дописать
-        adEntity.setAuthor(null);
-        adEntity.setDescription(null);
-
-        adEntity.setTitle(adDTO.getTitle());
-        adEntity.setPrice(adDTO.getPrice());
-        adEntity.setImage(adDTO.getImage());
-        return adEntity;
+    /**
+     * Mapping from ExtendedAdDTO to Ad
+     *
+     * @param extendedAdDTO instance of {@link ExtendedAdDTO} class
+     * @return instance of {@link Ad} class
+     */
+    public Ad mapExtendedAdToAdEntity(ExtendedAdDTO extendedAdDTO) {
+        Ad ad = new Ad();
+        if (extendedAdDTO.getPk() != null) {
+            ad.setId(extendedAdDTO.getPk());
+        }
+        userService.getUser().ifPresent(ad::setAuthor);
+        ad.setDescription(extendedAdDTO.getDescription());
+        ad.setTitle(extendedAdDTO.getTitle());
+        ad.setPrice(extendedAdDTO.getPrice());
+        String imageId = extendedAdDTO.getImage().replace(imagePrefix, "");
+        ad.setImage(imageId);
+        return ad;
     }
 }

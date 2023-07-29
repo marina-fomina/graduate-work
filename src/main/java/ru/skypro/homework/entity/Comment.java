@@ -1,8 +1,9 @@
 package ru.skypro.homework.entity;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 
@@ -10,7 +11,8 @@ import javax.persistence.*;
 @Table(name = "comments")
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,10 +22,14 @@ public class Comment {
     @JoinColumn(name = "author_id", nullable = false)
     private User author;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ad_id", nullable = false)
-    private AdEntity ad;
+    private Ad ad;
 
+    @Column(nullable = false)
     private String text;
+
+    @Column(name = "created_at")
+    private Long createdAt;
 
 }

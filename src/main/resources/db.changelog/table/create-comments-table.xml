@@ -5,27 +5,30 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
 
-    <changeSet id="create-ads-table.1" author="Anton Scherbakov">
+    <changeSet id="create-comments-table.1" author="Anton Scherbakov">
         <preConditions>
             <not>
-                <tableExists tableName="ads"/>
+                <tableExists tableName="comments"/>
             </not>
         </preConditions>
-        <createTable tableName="ads">
+        <createTable tableName="comments">
             <column name="id" type="INTEGER" autoIncrement="true">
                 <constraints primaryKey="true"/>
             </column>
             <column name="author_id" type="INTEGER">
+<!--                <constraints nullable="false"/>-->
+            </column>
+            <column name="ad_id" type="INTEGER">
                 <constraints nullable="false"/>
             </column>
-            <column name="image" type="TEXT"/>
-            <column name="price" type="INTEGER"/>
-            <column name="title" type="VARCHAR(100)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="description" type="TEXT"/>
+            <column name="text" type="TEXT"/>
+            <column name="created_at" type="BIGINT"/>
         </createTable>
-        <addForeignKeyConstraint baseTableName="ads" baseColumnNames="author_id" constraintName="FK_ADS_AUTHOR_ID" referencedTableName="users"
+        <addForeignKeyConstraint baseTableName="comments" baseColumnNames="ad_id" constraintName="FK_COMMENTS_AD_ID" referencedTableName="ads"
+                                 referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="comments" baseColumnNames="author_id"
+                                 constraintName="FK_COMMENTS_AUTHOR_ID"
+                                 referencedTableName="users"
                                  referencedColumnNames="id"/>
     </changeSet>
 

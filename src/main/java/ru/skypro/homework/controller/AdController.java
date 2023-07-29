@@ -10,7 +10,13 @@ import ru.skypro.homework.dto.AdDTO;
 import ru.skypro.homework.dto.AdsDTO;
 import ru.skypro.homework.dto.CreateOrUpdateAdDTO;
 import ru.skypro.homework.dto.ExtendedAdDTO;
+import ru.skypro.homework.model.Image;
 import ru.skypro.homework.service.AdService;
+import ru.skypro.homework.service.ImageService;
+import ru.skypro.homework.utils.AdMapping;
+
+import java.util.Objects;
+import java.util.Optional;
 
 @RestController
 @CrossOrigin(value = "http://localhost:3000")
@@ -18,6 +24,11 @@ import ru.skypro.homework.service.AdService;
 public class AdController {
     @Autowired
     AdService adService;
+    @Autowired
+    AdMapping adMapping;
+    @Autowired
+    ImageService imageService;
+
 
     @GetMapping
     public ResponseEntity<AdsDTO> getAds() {
@@ -26,56 +37,52 @@ public class AdController {
     }
 
     @PostMapping
-    public ResponseEntity<AdDTO> addAd(Authentication authentication,
-                                       @RequestParam MultipartFile image,
-                                       @RequestParam Integer price,
-                                       @RequestParam String title) {
+    public ResponseEntity<AdDTO> addAd(@RequestPart(name = "properties") CreateOrUpdateAdDTO createOrUpdateAdDTO,
+                                       @RequestPart MultipartFile image) {
         // Сохранение image в репозиторий пользователя
-        String imageLink = adService.saveImage(image);
+        String imageLink = imageService.saveImage(image);
+        ExtendedAdDTO extendedAdDTO = adMapping.mapCreateOrUpdateAdToExtendedAd(createOrUpdateAdDTO, imageLink);
+        return new ResponseEntity<>(adService.addAd(extendedAdDTO), HttpStatus.CREATED);
+    }
 
-        // Формируем DTO
-        AdDTO adDto = new AdDTO();
-        adDto.setTitle(title);
-        adDto.setPrice(price);
-        adDto.setImage(imageLink);
-
-        //Передача в service
-        adService.addAd(adDto);
-        return new ResponseEntity<>(adDto, HttpStatus.CREATED);
+    @GetMapping("/image")
+    public ResponseEntity<byte[]> getImage(String id) {
+        Image image = imageService.getImage(id);
+        return ResponseEntity.ok().contentType(image.getMediaType()).body(image.getBytes());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ExtendedAdDTO> getAdById(@PathVariable Integer id) {
-        ExtendedAdDTO extendedAdDTO = adService.getAdById(id);
-        return ResponseEntity.ok(extendedAdDTO);
+        Optional<ExtendedAdDTO> extendedAdDTO = Optional.ofNullable(adService.getAdById(id));
+        return extendedAdDTO.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteAd(@PathVariable Integer id) {
-        if (adService.deleteAd(id)) {
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<?> deleteAd(Authentication authentication,
+                                      @PathVariable Integer id) {
+        String username = authentication.getName();
+        return adService.deleteAd(username, id) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<AdDTO> patchAd(@PathVariable Integer id,
+    public ResponseEntity<AdDTO> patchAd(Authentication authentication,
+                                         @PathVariable Integer id,
                                          @RequestBody CreateOrUpdateAdDTO createOrUpdateAdDTO) {
-        adService.patchAd(id, createOrUpdateAdDTO);
-        return ResponseEntity.ok().build();
+        String username = authentication.getName();
+        AdDTO adDTO = adService.patchAd(username, id, createOrUpdateAdDTO);
+        return Objects.nonNull(adDTO) ? ResponseEntity.ok(adDTO) : ResponseEntity.notFound().build();
     }
 
     @GetMapping("/me")
-    public ResponseEntity<AdsDTO> getUserAd(Authentication authentication) {
-        AdsDTO ads = new AdsDTO();
-        return ResponseEntity.ok(ads);
+    public ResponseEntity<AdsDTO> getUserAd() {
+        AdsDTO adsDTO = adService.getUserAds();
+        return ResponseEntity.ok(adsDTO);
     }
 
     @PatchMapping("/{id}/image")
     public ResponseEntity<String> updateImage(@PathVariable Integer id,
-                                               @RequestParam MultipartFile image) {
-        String imageLink = adService.saveImage(id, image);
+                                              @RequestParam MultipartFile image) {
+        String imageLink = adService.updateAdImage(id, image);
         return imageLink == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(imageLink);
     }
 }

@@ -21,7 +21,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @Column(nullable = false, length = 32)
     private String username; // =login, =email
@@ -29,33 +29,26 @@ public class User {
     @Column(nullable = false, length = 24)
     private String password;
 
-    @Column
+    @Column(name = "first_name", length = 20)
     private String firstName;
 
-    @Column
+    @Column(name = "last_name",length = 20)
     private String lastName;
 
-    @Column
+    @Column(length = 16)
     private String phone;
 
-    @Column
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private Role role;
 
     @Column
     private String image; //ссылка на аватар пользователя
 
     @OneToMany(mappedBy="author")
-    private List<Comment> comments;
-
-    //  метод для установки связи
-    public void addComment(Comment comment) {
-        if (comments == null) {
-            comments = new ArrayList<>();
-        }
-
-        comments.add(comment);
-        comment.setAuthor(this);
-    }
+    private List<Comment> comments = new ArrayList<>();
+    @OneToMany(mappedBy = "author")
+    private List<Ad> ads = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {

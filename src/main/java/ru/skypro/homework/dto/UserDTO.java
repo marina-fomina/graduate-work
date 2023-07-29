@@ -7,6 +7,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class UserDTO {
 
     private Integer id;
@@ -14,5 +15,7 @@ public class UserDTO {
     private String firstName;
     private String lastName;
     private String phone;
+    // обновление спецификации v19 (https://github.com/BizinMitya/front-react-avito/blob/v1.19/openapi.yaml)
+    private Role role;
     private String image; //ссылка на аватар пользователя
 }
