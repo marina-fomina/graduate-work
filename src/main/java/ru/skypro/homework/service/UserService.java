@@ -3,7 +3,9 @@ package ru.skypro.homework.service;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.multipart.MultipartFile;
-import ru.skypro.homework.dto.*;
+import ru.skypro.homework.dto.PasswordDTO;
+import ru.skypro.homework.dto.UpdateUserDTO;
+import ru.skypro.homework.dto.UserDTO;
 import ru.skypro.homework.entity.User;
 
 import java.util.Optional;

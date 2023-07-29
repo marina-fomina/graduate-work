@@ -8,6 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.*;
@@ -25,29 +26,15 @@ import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService, UserDetailsService {
-
     private final Logger logger = LoggerFactory.getLogger(User.class);
+    @Autowired
+    PasswordEncoder encoder;
     @Autowired
     private UserRepository userRepository;
     @Autowired
     private ImageService imageService;
     @Autowired
     private UserMapping userMapping;
-
-    @Override
-    public boolean setNewPassword(PasswordDTO passwordDTO,
-                                  String username) {
-        User user = userRepository.getUserByUsername(username);
-        if (user.getPassword().equals(passwordDTO.getCurrentPassword()) &&
-                passwordDTO.getNewPassword() != null &&
-                !passwordDTO.getNewPassword().equals(passwordDTO.getCurrentPassword())) {
-            user.setPassword(passwordDTO.getNewPassword());
-            userRepository.save(user);
-            return true;
-        } else {
-            return false;
-        }
-    }
 
     @Override
     public UserDTO getUser(String username) {
@@ -62,6 +49,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public UpdateUserDTO updateUser(String newFirstName, String newLastName, String newPhone) {
+        Optional<User> user = getUser();
+        user.ifPresent(u -> {
+            u.setFirstName(newFirstName);
+            u.setLastName(newLastName);
+            u.setPhone(newPhone);
+            userRepository.save(u);
+        });
         return new UpdateUserDTO(newFirstName, newLastName, newPhone);
     }
 
@@ -77,6 +71,21 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         } else {
             logger.info("Not found User with username: {}", username);
             return null;
+        }
+    }
+
+    @Override
+    public boolean setNewPassword(PasswordDTO passwordDTO,
+                                  String username) {
+        User user = userRepository.getUserByUsername(username);
+        if (encoder.matches(passwordDTO.getCurrentPassword(), user.getPassword()) &&
+                passwordDTO.getNewPassword() != null &&
+                !passwordDTO.getNewPassword().equals(passwordDTO.getCurrentPassword())) {
+            user.setPassword(encoder.encode(passwordDTO.getNewPassword()));
+            userRepository.save(user);
+            return true;
+        } else {
+            return false;
         }
     }
 
