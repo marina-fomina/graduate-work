@@ -17,7 +17,7 @@ public interface UserService {
      * Set new user password
      *
      * @param passwordDTO includes new and current passwords
-     * @param username current user login
+     * @param username    current user login
      * @return true (if new password was set) or false (if not)
      */
     boolean setNewPassword(PasswordDTO passwordDTO,
@@ -42,8 +42,8 @@ public interface UserService {
      * Update information about user
      *
      * @param newFirstName new user first name
-     * @param newLastName new user last name
-     * @param newPhone new user phone number
+     * @param newLastName  new user last name
+     * @param newPhone     new user phone number
      * @return instance of {@link UpdateUserDTO} class that includes user first name, last name and phone number
      */
     UpdateUserDTO updateUser(String newFirstName, String newLastName, String newPhone);
@@ -52,7 +52,7 @@ public interface UserService {
      * Update user avatar
      *
      * @param username current user login
-     * @param image new avatar
+     * @param image    new avatar
      * @return UUID
      */
     String updateUserImage(MultipartFile image, String username);

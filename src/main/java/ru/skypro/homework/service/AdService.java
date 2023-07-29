@@ -35,7 +35,7 @@ public interface AdService {
      * Delete an ad by its primary key
      *
      * @param username username of ad author
-     * @param id ad primary key
+     * @param id       ad primary key
      * @return true (if ad was found and deleted) or false (if not)
      */
     boolean deleteAd(String username, Integer id);
